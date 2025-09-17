@@ -1,0 +1,64 @@
+{% extends "shopapp/base.html" %}
+{% load static %}
+
+{% block title %}
+    Shop Index | Products: {{ products|length }}
+{% endblock %}
+
+{% block body %}
+    <h1>Hello Shop Index!</h1>
+
+    {% comment "Информация о разделе" %}
+        Этот раздел отображает каталог продуктов магазина
+        с различной информацией и статистикой
+    {% endcomment %}
+
+    <div>
+        <h2>Our Products (Total: {{ products|length }})</h2>
+        <ul>
+            {% for product in products %}
+            <li>
+                <strong>{{ product.name|upper }}</strong> for ${{ product.price }} ← Длина: {{ product.name|length }} символов
+            </li>
+            {% empty %}
+            <li>No products available at the moment.</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    {# Находим самый дорогой и самый дешевый товар #}
+    {% with products|dictsortreversed:"price"|first as most_expensive %}
+    {% with products|dictsort:"price"|first as cheapest %}
+    <div style="background-color: #f0f8ff; padding: 10px; margin: 10px 0; border-radius: 5px;">
+        <h3>📊 Статистика магазина:</h3>
+        <p>Самый дорогой товар:
+        <strong>{{ most_expensive.name|upper }} for ${{ most_expensive.price }}</strong>
+        </p>
+        <p>Самый дешевый товар:
+        <strong>{{ cheapest.name|upper }} for ${{ cheapest.price }}</strong>
+        </p>
+    </div>
+    {% endwith %}
+    {% endwith %}
+
+    {% if products %}
+        <div style="background-color: #e8f5e8; padding: 10px; border-radius: 5px;">
+            <p>✅ В наличии: {{ products|length }} товар(ов)</p>
+        </div>
+    {% else %}
+        <div style="background-color: #fff0f0; padding: 10px;">
+            <p>⚠️ Внимание: продуктов нет в наличии!</p>
+        </div>
+    {% endif %}
+
+    <div>
+        <h3>📝 Описание магазина:</h3>
+        <p>Мы предлагаем широкий ассортимент электроники по конкурентным ценам.
+           Каждый товар проходит тщательную проверку качества.</p>
+    </div>
+
+    <div>
+        <p>Today is Wednesday.</p>
+    </div>
+
+{% endblock %}
