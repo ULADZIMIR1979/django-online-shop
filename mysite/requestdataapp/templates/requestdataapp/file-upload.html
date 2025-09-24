@@ -1,0 +1,116 @@
+{% extends "requestdataapp/base.html" %}
+
+{% block title %}
+    File Upload
+{% endblock %}
+
+{% block body %}
+    <div style="max-width: 600px; margin: 0 auto;">
+        <h1>File Upload</h1>
+
+        {# Alert messages #}
+        {% if error %}
+            <div class="alert alert-error">
+                <strong>Error:</strong> {{ error }}
+            </div>
+        {% endif %}
+
+        {% if success %}
+            <div class="alert alert-success">
+                <strong>Success:</strong> {{ success }}
+                {% if file_size %}
+                    <br><small>File size: {{ file_size }} bytes</small>
+                {% endif %}
+            </div>
+        {% endif %}
+
+        {# Upload form #}
+        <div class="upload-form">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <label for="myfile">Choose file to upload:</label>
+                    <input type="file" name="myfile" id="myfile" required
+                           accept="*/*" style="margin-top: 5px;">
+                </div>
+
+                <button type="submit" class="btn btn-primary">Upload File</button>
+            </form>
+        </div>
+
+        {# Requirements info #}
+        <div class="requirements">
+            <h3>Requirements:</h3>
+            <ul>
+                <li>Maximum file size: <strong>1 MB</strong></li>
+                <li>Allowed file types: <strong>All</strong></li>
+            </ul>
+        </div>
+    </div>
+
+    <style>
+        .alert {
+            padding: 12px;
+            border-radius: 4px;
+            margin: 15px 0;
+        }
+
+        .alert-error {
+            background-color: #ffe6e6;
+            border: 1px solid #ffcccc;
+            color: #cc0000;
+        }
+
+        .alert-success {
+            background-color: #e6ffe6;
+            border: 1px solid #ccffcc;
+            color: #006600;
+        }
+
+        .form-group {
+            margin: 20px 0;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input[type="file"] {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 100%;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background-color: #0056b3;
+        }
+
+        .requirements {
+            margin-top: 30px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+
+        .requirements h3 {
+            margin-top: 0;
+        }
+
+        .requirements ul {
+            margin-bottom: 0;
+        }
+    </style>
+{% endblock %}
