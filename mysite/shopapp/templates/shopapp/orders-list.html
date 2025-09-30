@@ -6,6 +6,7 @@
 
 {% block body %}
     <h1>Orders:</h1>
+
     {% if orders %}
         <div>
             {% for order in orders %}
@@ -28,4 +29,9 @@
     {% else %}
         <h3>No orders yet</h3>
     {% endif %}
+
+    <div>
+        <a href="{% url 'shopapp:create_order' %}">Return to order creation</a>
+    </div>
+
 {% endblock %}
