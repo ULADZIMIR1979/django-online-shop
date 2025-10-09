@@ -12,19 +12,22 @@ class Product(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     archived = models.BooleanField(default=False)
 
-    # @property
-    # def description_shot(self)->str:
-    #     if len(self.description) < 50:
-    #         return self.description
-    #     return self.description[:50] + "..."
-
     def __str__(self)->str:
         return f"Product(pk={self.pk}, name={self.name!r})"
 
 
 class Order(models.Model):
+    class Meta:
+        ordering = ['-created_at']
     delivery_address = models.TextField(null=False, blank=True)
     promocode = models.CharField(max_length=20, null=False, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, on_delete=models.PROTECT)
     products = models.ManyToManyField(Product, related_name='orders',)
+    archived = models.BooleanField(default=False)
+
+    def __str__(self)->str:
+        if self.pk:
+            return f"Order(pk={self.pk}, user={self.user.username!r})"
+        else:
+            return f"Order(user={self.user.username!r})"
