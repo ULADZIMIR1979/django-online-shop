@@ -6,27 +6,41 @@
 
 {% block body %}
     <h1>Products:</h1>
+
+    {# ИСПРАВЛЕННАЯ ПРОВЕРКА ПРАВ - используем стандартное разрешение Django #}
+    {% if perms.shopapp.add_product %}
+        <div style="margin-bottom: 20px;">
+            <a href="{% url 'shopapp:product_create' %}" style="background-color: #28a745; color: white; padding: 10px 15px; text-decoration: none; border-radius: 5px;">
+                Create a new product
+            </a>
+        </div>
+    {% endif %}
+
     {% if products %}
         <div>
             {% for product in products %}
-                <div>
-                    <a href="{% url 'shopapp:product_details' pk=product.pk %}">{{ product.name }}</a>
+                <div style="border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 5px;">
+                    <div>
+                        <a href="{% url 'shopapp:product_details' pk=product.pk %}"><strong>{{ product.name }}</strong></a>
+                    </div>
+                    <div><span style="color: blue;">Price</span>: {{ product.price }}</div>
+                    <div><span style="color: blue;">Discount</span>: {% firstof product.discount 'no discount' %}</div>
+                    <div><span style="color: blue;">Archived</span>: {{ product.archived }}</div>
+                    <div><span style="color: blue;">Created by</span>: {{ product.created_by.username }}</div>
+
+                    {# Кнопка редактирования только для автора или суперпользователя #}
+                    {% if user.is_superuser or product.created_by == user and perms.shopapp.change_product %}
+                        <div style="margin-top: 10px;">
+                            <a href="{% url 'shopapp:product_update' pk=product.pk %}" style="background-color: #ffc107; color: black; padding: 5px 10px; text-decoration: none; border-radius: 3px; margin-right: 10px;">
+                                Edit
+                            </a>
+                        </div>
+                    {% endif %}
                 </div>
-                <br>
-                <div><span style="color: blue;">Price</span>:  {{ product.price }}</div>
-                <div><span style="color: blue;">Discount</span>:  {% firstof product.discount 'no discount' %}</div>
-                <div><span style="color: blue;">Archived</span>: {{ product.archived }}</div>
-                <br>
             {% endfor %}
         </div>
-
-
     {% else %}
         <h3>No products yet</h3>
     {% endif %}
 
-    <br>
-    <div>
-        <a href="{% url 'shopapp:product_create' %}">Create a new product</a>
-    </div>
 {% endblock %}

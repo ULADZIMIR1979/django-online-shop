@@ -4,6 +4,10 @@ from django.db import models
 class Product(models.Model):
     class Meta:
         ordering = ['name']
+        permissions = [
+            ("can_create_product", "Can create product"),
+            ("can_change_product", "Can change product"),
+        ]
 
     name = models.CharField(max_length=100)
     description = models.TextField(null=False, blank=True)
@@ -11,6 +15,12 @@ class Product(models.Model):
     discount = models.PositiveSmallIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     archived = models.BooleanField(default=False)
+    created_by = models.ForeignKey(  # Добавляем связь с пользователем
+        User,
+        on_delete=models.CASCADE,
+        null=True,  # Временно, для существующих записей
+        blank=True
+    )
 
     def __str__(self)->str:
         return f"Product(pk={self.pk}, name={self.name!r})"

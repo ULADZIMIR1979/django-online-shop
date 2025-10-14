@@ -61,4 +61,13 @@
         <p>Today is Wednesday.</p>
     </div>
 
+    {# ИСПРАВЛЕННАЯ ПРОВЕРКА ПРАВ - используем стандартное разрешение Django #}
+    {% if perms.shopapp.add_product %}
+        <div>
+            <a href="{% url 'shopapp:product_create' %}" class="btn btn-success">
+                Create a new product
+            </a>
+        </div>
+    {% endif %}
+
 {% endblock %}
