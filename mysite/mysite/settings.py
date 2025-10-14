@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 
+from django.urls import reverse_lazy
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -83,6 +85,11 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
+        'OPTIONS': {
+            'timeout': 30,
+            'check_same_thread': False,
+        },
+        'ATOMIC_REQUESTS': False,  # ← ДОБАВЬТЕ ЭТУ СТРОЧКУ!
     }
 }
 
@@ -127,4 +134,18 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-LOGIN_REDIRECT_URL = '/admin/'
+LOGIN_REDIRECT_URL = reverse_lazy("myauth:about-me")
+LOGIN_URL = reverse_lazy("myauth:login")
+
+# Session settings - use file-based sessions to avoid database locks
+SESSION_ENGINE = 'django.contrib.sessions.backends.file'
+SESSION_FILE_PATH = '/tmp/django_sessions'
+
+# Create sessions directory if it doesn't exist
+import os
+if not os.path.exists('/tmp/django_sessions'):
+    os.makedirs('/tmp/django_sessions')
+
+# Optional: Reduce session lifetime
+SESSION_COOKIE_AGE = 3600  # 1 hour
+SESSION_SAVE_EVERY_REQUEST = False

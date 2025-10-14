@@ -1,33 +1,45 @@
 {% extends "shopapp/base.html" %}
 
 {% block title %}
-    Order #{{ order.pk }}
+    {% if access_denied %}
+        Доступ запрещен
+    {% else %}
+        Order #{{ order.pk }}
+    {% endif %}
 {% endblock %}
 
 {% block body %}
-    <h1>Order <strong>#{{ order.pk }}</strong></h1>
-    <div>
-        <div><span style="color: blue;">Delivery address</span>: <em>{{ order.delivery_address }}</em></div>
-        <div><span style="color: blue;">Promocode</span>: <strong>{{ order.promocode }}</strong></div>
-        <div><span style="color: blue;">User</span>: {{ order.user.username }}</div>
-        <div><span style="color: blue;">Archived</span>: {{ order.archived }}</div>
-        <div><span style="color: blue;">Products in order</span>:</div>
-        <ul>
-            {% for product in order.products.all %}
-                <li>{{ product.name }} for ${{ product.price }}</li>
-            {% endfor %}
-        </ul>
-    </div>
-    <br>
-    <div>
-        <a href="{% url 'shopapp:order_update' pk=order.pk %}">Update order</a>
-    </div>
-    <br>
-    <div>
-        <a href="{% url 'shopapp:order_delete' pk=order.pk %}">Archive order</a>
-    </div>
-    <br>
-    <div>
-        <a href="{% url 'shopapp:order_list' %}">Back to orders list</a>
-    </div>
+    {% if access_denied %}
+        <div style="text-align: center; margin: 50px;">
+            <h1>⚠️ Доступ запрещен</h1>
+            <p>Вы можете просматривать только свои заказы.</p>
+            <a href="{% url 'shopapp:order_list' %}">Вернуться к списку заказов</a>
+        </div>
+    {% else %}
+        <h1>Order <strong>#{{ order.pk }}</strong></h1>
+        <div>
+            <div><span style="color: blue;">Delivery address</span>: <em>{{ order.delivery_address }}</em></div>
+            <div><span style="color: blue;">Promocode</span>: <strong>{{ order.promocode }}</strong></div>
+            <div><span style="color: blue;">User</span>: {{ order.user.username }}</div>
+            <div><span style="color: blue;">Archived</span>: {{ order.archived }}</div>
+            <div><span style="color: blue;">Products in order</span>:</div>
+            <ul>
+                {% for product in order.products.all %}
+                    <li>{{ product.name }} for ${{ product.price }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        <br>
+        <div>
+            <a href="{% url 'shopapp:order_update' pk=order.pk %}">Update order</a>
+        </div>
+        <br>
+        <div>
+            <a href="{% url 'shopapp:order_delete' pk=order.pk %}">Archive order</a>
+        </div>
+        <br>
+        <div>
+            <a href="{% url 'shopapp:order_list' %}">Back to orders list</a>
+        </div>
+    {% endif %}
 {% endblock %}

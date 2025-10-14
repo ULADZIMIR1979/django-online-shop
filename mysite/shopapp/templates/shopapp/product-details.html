@@ -11,16 +11,26 @@
         <div><span style="color: blue;">Price</span>: {{ product.price }}</div>
         <div><span style="color: blue;">Discount</span>: {{ product.discount }}</div>
         <div><span style="color: blue;">Archived</span>: {{ product.archived }}</div>
+        <div><span style="color: blue;">Created by</span>: {{ product.created_by.username }}</div>
     </div>
     <br>
-    <div>
-        <a href="{% url 'shopapp:product_update' pk=product.pk %}">Update product</a>
-    </div>
+
+    {# Проверка прав на редактирование: суперпользователь ИЛИ автор с правом изменения #}
+    {% if user.is_superuser or product.created_by == user and perms.shopapp.change_product %}
+        <div>
+            <a href="{% url 'shopapp:product_update' pk=product.pk %}">Update product</a>
+        </div>
+    {% endif %}
     <br>
-    <div>
-        <a href="{% url 'shopapp:product_delete' pk=product.pk %}">Archive product</a>
-    </div>
+
+    {# Проверка прав на архивирование: суперпользователь ИЛИ автор с правом удаления #}
+    {% if user.is_superuser or product.created_by == user and perms.shopapp.delete_product %}
+        <div>
+            <a href="{% url 'shopapp:product_delete' pk=product.pk %}">Archive product</a>
+        </div>
+    {% endif %}
     <br>
+
     <div>
         <a href="{% url 'shopapp:products_list' %}">Back to products list</a>
     </div>

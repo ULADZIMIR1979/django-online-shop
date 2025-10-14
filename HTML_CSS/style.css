@@ -1,0 +1,19 @@
+.reg-form {
+            max-width: 800px;
+            margin: 0 auto;
+}
+
+/*.reg-form > div {
+            display: flex;
+            justify-content: space-between;
+            argin-bottom: 30px;
+}
+
+.reg-form__input {
+        width: 50%;
+}
+
+.reg-form textarea {
+        height: 150px;
+} */
+

@@ -2,16 +2,26 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>
-        {% block title %}
-
-        {% endblock %}
-    </title>
+    <title>{% block title %}{% endblock %}</title>
 </head>
 <body>
-{% block body %}
+    <nav style="background: #f0f0f0; padding: 10px; margin-bottom: 20px;">
+        {% if user.is_authenticated %}
+            <span>Hello, {{ user.username }}!</span>
+            <a href="{% url 'myauth:about-me' %}">Profile</a>
 
-{% endblock %}
+            <!-- Форма для выхода -->
+            <form method="post" action="{% url 'myauth:logout' %}" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit">Logout</button>
+            </form>
+        {% else %}
+            <a href="{% url 'myauth:login' %}">Login</a>
+            <br>
+            <a href="{% url 'myauth:register' %}">Register</a>
+        {% endif %}
+    </nav>
 
+    {% block body %}{% endblock %}
 </body>
 </html>
