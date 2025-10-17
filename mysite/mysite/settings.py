@@ -63,10 +63,13 @@ ROOT_URLCONF = 'mysite.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            BASE_DIR / 'templates',
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
+                'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
@@ -89,7 +92,7 @@ DATABASES = {
             'timeout': 30,
             'check_same_thread': False,
         },
-        'ATOMIC_REQUESTS': False,  # ← ДОБАВЬТЕ ЭТУ СТРОЧКУ!
+        'ATOMIC_REQUESTS': False,
     }
 }
 

@@ -33,6 +33,11 @@
         <h3>No orders yet</h3>
     {% endif %}
 
-    <a href="{% url 'shopapp:create_order' %}">Create new order</a>
+    <div style="margin-bottom: 20px;">
+        <a href="{% url 'shopapp:create_order' %}" style="background-color: #28a745; color: white; padding: 10px 15px; text-decoration: none; border-radius: 5px;">
+            <i class="bi bi-plus"></i>
+            Create new order
+        </a>
+    </div>
 
 {% endblock %}

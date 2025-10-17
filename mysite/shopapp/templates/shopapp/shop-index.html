@@ -29,6 +29,7 @@
     {# Находим самый дорогой и самый дешевый товар #}
     {% with products|dictsortreversed:"price"|first as most_expensive %}
     {% with products|dictsort:"price"|first as cheapest %}
+
     <div style="background-color: #f0f8ff; padding: 10px; margin: 10px 0; border-radius: 5px;">
         <h3>📊 Статистика магазина:</h3>
         <p>Самый дорогой товар:
@@ -57,17 +58,5 @@
            Каждый товар проходит тщательную проверку качества.</p>
     </div>
 
-    <div>
-        <p>Today is Wednesday.</p>
-    </div>
-
-    {# ИСПРАВЛЕННАЯ ПРОВЕРКА ПРАВ - используем стандартное разрешение Django #}
-    {% if perms.shopapp.add_product %}
-        <div>
-            <a href="{% url 'shopapp:product_create' %}" class="btn btn-success">
-                Create a new product
-            </a>
-        </div>
-    {% endif %}
 
 {% endblock %}

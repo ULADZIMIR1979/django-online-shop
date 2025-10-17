@@ -11,6 +11,7 @@
     {% if perms.shopapp.add_product %}
         <div style="margin-bottom: 20px;">
             <a href="{% url 'shopapp:product_create' %}" style="background-color: #28a745; color: white; padding: 10px 15px; text-decoration: none; border-radius: 5px;">
+                <i class="bi bi-plus"></i>
                 Create a new product
             </a>
         </div>
@@ -42,5 +43,11 @@
     {% else %}
         <h3>No products yet</h3>
     {% endif %}
+    <div class="ms-3 d-grid gap-2 d-md-block">
+        <a href="{% url 'shopapp:index' %}" class="btn btn-primary btn-lg">
+            <i class="bi bi-cart3"></i>
+            Back to shop
+        </a>
+    </div>
 
 {% endblock %}

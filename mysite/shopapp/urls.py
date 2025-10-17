@@ -1,16 +1,21 @@
 from django.urls import path
-from .views import (ShopIndexView,
-                    GroupsListView,
-                    ProductDetailsView,
-                    ProductsListView,
-                    OrdersListView,
-                    OrderDetailsView,
-                    ProductCreateView,
-                    ProductUpdateView,
-                    OrderCreateView,
-                    OrderUpdateView,
-                    ProductDeleteView,
-                    OrderDeleteView
+from .views import (
+    ShopIndexView,
+    GroupsListView,
+    ProductDetailsView,
+    ProductsListView,
+    OrdersListView,
+    OrderDetailsView,
+    ProductCreateView,
+    ProductUpdateView,
+    OrderCreateView,
+    OrderUpdateView,
+    ProductDeleteView,
+    OrderDeleteView,
+    ProductsDataExportView,
+    OrdersExportView,
+    OrdersExportJSONView,
+    OrdersExportDownloadView,
 )
 
 app_name = 'shopapp'
@@ -19,6 +24,7 @@ urlpatterns = [
     path('', ShopIndexView.as_view(), name='index'),
     path('groups/', GroupsListView.as_view(), name='groups_list'),
     path('products/', ProductsListView.as_view(), name='products_list'),
+    path('products/export/', ProductsDataExportView.as_view(), name='products_export'),
     path('products/create/', ProductCreateView.as_view(), name='product_create'),
     path('products/<int:pk>/', ProductDetailsView.as_view(), name='product_details'),
     path('products/<int:pk>/update/', ProductUpdateView.as_view(), name='product_update'),
@@ -28,4 +34,8 @@ urlpatterns = [
     path('orders/<int:pk>/', OrderDetailsView.as_view(), name='order_details'),
     path('orders/<int:pk>/update/', OrderUpdateView.as_view(), name='order_update'),
     path('orders/<int:pk>/archive/', OrderDeleteView.as_view(), name='order_delete'),
+    # Новые пути для экспорта заказов
+    path('orders/export/', OrdersExportView.as_view(), name='orders_export'),
+    path('orders/export/json/', OrdersExportJSONView.as_view(), name='orders_export_json'),
+    path('orders/export/download/', OrdersExportDownloadView.as_view(), name='orders_export_download'),
 ]

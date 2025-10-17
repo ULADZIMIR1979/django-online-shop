@@ -17,9 +17,10 @@ class Product(models.Model):
     archived = models.BooleanField(default=False)
     created_by = models.ForeignKey(  # Добавляем связь с пользователем
         User,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         null=True,  # Временно, для существующих записей
-        blank=True
+        blank=True,
+        related_name='products'
     )
 
     def __str__(self)->str:

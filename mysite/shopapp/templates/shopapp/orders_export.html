@@ -1,0 +1,164 @@
+{% extends "shopapp/base.html" %}
+
+{% block title %}
+Export Orders - MyShop
+{% endblock %}
+
+{% block body %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card shadow-lg border-0">
+            <div class="card-header bg-primary text-white py-3">
+                <h1 class="h3 mb-0">📊 Export Orders Data</h1>
+            </div>
+            <div class="card-body p-4">
+                <p class="lead mb-4">Export all orders to JSON format with one click!</p>
+
+                <div class="mb-4">
+                    <h5 class="mb-3">What's included in the export:</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul class="list-group">
+                                <li class="list-group-item d-flex align-items-center">
+                                    <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                    Order ID and details
+                                </li>
+                                <li class="list-group-item d-flex align-items-center">
+                                    <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                    Delivery address
+                                </li>
+                                <li class="list-group-item d-flex align-items-center">
+                                    <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                    Promo codes
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="list-group">
+                                <li class="list-group-item d-flex align-items-center">
+                                    <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                    User information
+                                </li>
+                                <li class="list-group-item d-flex align-items-center">
+                                    <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                    Product lists
+                                </li>
+                                <li class="list-group-item d-flex align-items-center">
+                                    <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                    Timestamps
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-4 mb-4">
+                    <div class="col-lg-6">
+                        <div class="card h-100 border-primary">
+                            <div class="card-body text-center p-4">
+                                <div class="mb-3">
+                                    <i class="bi bi-eye-fill text-primary" style="font-size: 2rem;"></i>
+                                </div>
+                                <h5 class="card-title">Preview in Browser</h5>
+                                <p class="card-text text-muted mb-3">
+                                    View JSON data directly in your browser
+                                </p>
+                                <a href="{% url 'shopapp:orders_export_json' %}"
+                                   class="btn btn-outline-primary btn-lg w-100"
+                                   target="_blank">
+                                    <i class="bi bi-eye me-2"></i>View JSON
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6">
+                        <div class="card h-100 border-success">
+                            <div class="card-body text-center p-4">
+                                <div class="mb-3">
+                                    <i class="bi bi-download text-success" style="font-size: 2rem;"></i>
+                                </div>
+                                <h5 class="card-title">Download File</h5>
+                                <p class="card-text text-muted mb-3">
+                                    Download as JSON file to your computer
+                                </p>
+                                <form method="get" action="{% url 'shopapp:orders_export_download' %}">
+                                    <button type="submit" class="btn btn-success btn-lg w-100">
+                                        <i class="bi bi-download me-2"></i>Download File
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="alert alert-info">
+                    <div class="d-flex">
+                        <i class="bi bi-info-circle-fill me-2"></i>
+                        <div>
+                            <strong>Note:</strong> The exported file will be saved in the project's
+                            <code>exports/</code> directory with a timestamp in the filename.
+                            Only staff users can access this feature.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mt-4 border-0 shadow-sm">
+            <div class="card-header bg-light py-3">
+                <h5 class="mb-0">
+                    <i class="bi bi-folder me-2"></i>Export Information
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-md-4 mb-3">
+                        <div class="border rounded p-3">
+                            <h6 class="text-primary">Total Orders</h6>
+                            <h4 class="text-primary">{{ orders_count }}</h4>
+                            <small class="text-muted">Available for export</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="border rounded p-3">
+                            <h6 class="text-success">File Format</h6>
+                            <h4 class="text-success">JSON</h4>
+                            <small class="text-muted">Standard format</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="border rounded p-3">
+                            <h6 class="text-info">Data Freshness</h6>
+                            <h4 class="text-info">Real-time</h4>
+                            <small class="text-muted">Current database state</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.card {
+    border-radius: 15px;
+}
+.btn {
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+.list-group-item {
+    border: none;
+    border-bottom: 1px solid #eee;
+}
+.list-group-item:last-child {
+    border-bottom: none;
+}
+</style>
+{% endblock %}

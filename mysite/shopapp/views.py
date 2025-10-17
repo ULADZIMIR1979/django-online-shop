@@ -1,12 +1,17 @@
 from timeit import default_timer
-
+import json
+import os
+from django.conf import settings
+from django.utils.timezone import now
 from django.contrib.auth.models import Group
-from django.http import HttpResponse, HttpRequest, HttpResponseRedirect
+from django.http import HttpResponse, HttpRequest, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, redirect, reverse, get_object_or_404
 from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import TemplateView, ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.decorators import user_passes_test
+from django.utils.decorators import method_decorator
 
 from .forms import ProductForm, OrderForm, GroupForm
 from .models import Product, Order
@@ -25,6 +30,7 @@ class ShopIndexView(View):
         }
         return render(request, 'shopapp/shop-index.html', context=context)
 
+
 class GroupsListView(View):
     def get(self, request: HttpRequest) -> HttpResponse:
         context = {
@@ -37,7 +43,6 @@ class GroupsListView(View):
         form = GroupForm(request.POST)
         if form.is_valid():
             form.save()
-
         return redirect(request.path)
 
 
@@ -49,17 +54,9 @@ class ProductDetailsView(DetailView):
 
 class ProductsListView(ListView):
     template_name = 'shopapp/products-list.html'
-    # model = Product
     context_object_name = 'products'
     queryset = Product.objects.filter(archived=False)
 
-
-# class ProductCreateView(UserPassesTestMixin, CreateView):
-#     def test_func(self):
-#         return self.request.user.is_superuser
-#     model = Product
-#     fields = "name", "price", "description", "discount"
-#     success_url = reverse_lazy('shopapp:products_list')
 
 class ProductCreateView(PermissionRequiredMixin, CreateView):
     permission_required = 'shopapp.add_product'
@@ -68,7 +65,6 @@ class ProductCreateView(PermissionRequiredMixin, CreateView):
     success_url = reverse_lazy('shopapp:products_list')
 
     def form_valid(self, form):
-        # Связываем продукт с текущим пользователем
         form.instance.created_by = self.request.user
         return super().form_valid(form)
 
@@ -79,15 +75,9 @@ class ProductUpdateView(UserPassesTestMixin, UpdateView):
     template_name_suffix = '_update_form'
 
     def test_func(self):
-        """Проверяем может ли пользователь редактировать продукт"""
         product = self.get_object()
-
-        # Суперпользователь может редактировать всегда
         if self.request.user.is_superuser:
             return True
-
-        # Обычный пользователь может редактировать только свои продукты
-        # и если у него есть разрешение на изменение
         return (
                 self.request.user.has_perm('shopapp.change_product') and
                 product.created_by == self.request.user
@@ -111,7 +101,6 @@ class ProductDeleteView(DeleteView):
         return HttpResponseRedirect(success_url)
 
 
-
 class OrdersListView(LoginRequiredMixin, ListView):
     template_name = 'shopapp/order-list.html'
     model = Order
@@ -123,15 +112,6 @@ class OrdersListView(LoginRequiredMixin, ListView):
     )
 
 
-# class OrderDetailsView(PermissionRequiredMixin, DetailView):
-#     permission_required = 'shopapp.view_order'
-#     template_name = 'shopapp/order_detail.html'
-#     model = Order
-#     context_object_name = 'order'
-#     queryset = (
-#         Order.objects.select_related('user').prefetch_related("products")
-#     )
-
 class OrderDetailsView(LoginRequiredMixin, DetailView):
     template_name = 'shopapp/order_detail.html'
     model = Order
@@ -139,14 +119,9 @@ class OrderDetailsView(LoginRequiredMixin, DetailView):
 
     def get_object(self, queryset=None):
         order = super().get_object(queryset)
-
-        # Сохраняем информацию о доступе
         self.access_denied = not (self.request.user.is_superuser or order.user == self.request.user)
-
         if self.access_denied:
-            # Все равно возвращаем объект, но в шаблоне проверим access_denied
             return order
-
         return order
 
     def get_context_data(self, **kwargs):
@@ -185,3 +160,116 @@ class OrderDeleteView(DeleteView):
         return HttpResponseRedirect(success_url)
 
 
+class ProductsDataExportView(View):
+    def get(self, request: HttpRequest) -> JsonResponse:
+        products = Product.objects.order_by("pk").all()
+        products_data = [
+            {
+                "pk": product.pk,
+                "name": product.name,
+                "price": product.price,
+                "archived": product.archived,
+            }
+            for product in products
+        ]
+        return JsonResponse({"products": products_data})
+
+
+class OrdersExportView(View):
+    """Главная страница экспорта заказов с кнопками"""
+
+    @method_decorator(user_passes_test(lambda u: u.is_staff))
+    def dispatch(self, *args, **kwargs):
+        return super().dispatch(*args, **kwargs)
+
+    def get(self, request: HttpRequest) -> HttpResponse:
+        # Получаем количество заказов для отображения в шаблоне
+        orders_count = Order.objects.count()
+
+        context = {
+            'orders_count': orders_count,
+        }
+        return render(request, 'shopapp/orders_export.html', context=context)
+
+
+class OrdersExportJSONView(View):
+    """Возвращает JSON данных заказов в браузере"""
+
+    @method_decorator(user_passes_test(lambda u: u.is_staff))
+    def dispatch(self, *args, **kwargs):
+        return super().dispatch(*args, **kwargs)
+
+    def get(self, request: HttpRequest) -> JsonResponse:
+        orders = Order.objects.select_related('user').prefetch_related('products').all()
+
+        orders_data = []
+        for order in orders:
+            orders_data.append({
+                "id": order.pk,  # ИЗМЕНЕНО: 'id' вместо 'pk'
+                "delivery_address": order.delivery_address,
+                "promocode": order.promocode,
+                "user": {  # ИЗМЕНЕНО: объект user вместо user_id
+                    "id": order.user.pk if order.user else None,
+                    "username": order.user.username if order.user else None,
+                },
+                "products": [  # ИЗМЕНЕНО: массив объектов вместо ID
+                    {
+                        "id": product.pk,
+                        "name": product.name,
+                        "price": str(product.price),
+                    }
+                    for product in order.products.all()
+                ],
+                "archived": order.archived,  # ДОБАВЛЕНО: поле archived
+            })
+
+        return JsonResponse({"orders": orders_data})
+
+
+class OrdersExportDownloadView(View):
+    """Скачивание JSON файла с данными заказов"""
+
+    @method_decorator(user_passes_test(lambda u: u.is_staff))
+    def dispatch(self, *args, **kwargs):
+        return super().dispatch(*args, **kwargs)
+
+    def get(self, request: HttpRequest) -> HttpResponse:
+        orders = Order.objects.select_related('user').prefetch_related('products').all()
+
+        orders_data = []
+        for order in orders:
+            orders_data.append({
+                "pk": order.pk,
+                "delivery_address": order.delivery_address,
+                "promocode": order.promocode,
+                "user_id": order.user.pk if order.user else None,
+                "products": [product.pk for product in order.products.all()],
+            })
+
+        result_data = {"orders": orders_data}
+
+        # Создаем директорию для экспорта если её нет
+        export_dir = os.path.join(settings.BASE_DIR, 'exports')
+        os.makedirs(export_dir, exist_ok=True)
+
+        # Генерируем имя файла с timestamp
+        timestamp = now().strftime("%Y%m%d_%H%M%S")
+        filename = f"orders_export_{timestamp}.json"
+        filepath = os.path.join(export_dir, filename)
+
+        # Сохраняем данные в файл
+        try:
+            with open(filepath, 'w', encoding='utf-8') as f:
+                json.dump(result_data, f, ensure_ascii=False, indent=2)
+
+            # Возвращаем файл для скачивания
+            with open(filepath, 'rb') as f:
+                response = HttpResponse(f.read(), content_type='application/json')
+                response['Content-Disposition'] = f'attachment; filename="{filename}"'
+                return response
+
+        except Exception as e:
+            return JsonResponse({
+                "status": "error",
+                "message": f"Ошибка при сохранении файла: {str(e)}"
+            }, status=500)
