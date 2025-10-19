@@ -8,11 +8,36 @@
     <h1>User info</h1>
     {% if user.is_authenticated %}
         <h2>Details</h2>
-        <p>Username: {{ user.username }}</p>
-        <p>First name: {{ user.first_name }}</p>
-        <p>Last name: {{ user.last_name }}</p>
-        <p>Email: {{ user.email }}</p>
-        <p>Bio: {{ user.profile.bio }}</p>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <p>Username: {{ user.username }}</p>
+            <p>First name: {{ user.first_name }}</p>
+            <p>Last name: {{ user.last_name }}</p>
+            <p>Email: {{ user.email }}</p>
+
+            <p>
+                <label for="id_bio">Bio:</label><br>
+                <textarea name="bio" id="id_bio" rows="4" cols="50">{{ user.profile.bio }}</textarea>
+            </p>
+
+            <p>
+                <strong>Avatar:</strong><br>
+                {% if user.profile.avatar %}
+                    <img src="{{ user.profile.avatar.url }}" alt="Avatar" class="avatar"><br>
+                    <small>Current avatar</small>
+                {% else %}
+                    <p>No avatar uploaded</p>
+                {% endif %}
+            </p>
+
+            <p>
+                <label for="id_avatar">Change avatar:</label><br>
+                <input type="file" name="avatar" id="id_avatar">
+            </p>
+
+            <button type="submit">Update Profile</button>
+        </form>
     {% else %}
         <h2>User is anonymous</h2>
     {% endif %}

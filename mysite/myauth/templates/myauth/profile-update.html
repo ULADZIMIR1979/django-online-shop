@@ -1,0 +1,36 @@
+{% extends "myauth/base.html" %}
+
+{% block title %}
+    Edit Profile: {{ profile.user.username }}
+{% endblock %}
+
+{% block body %}
+    <h1>Edit Profile: {{ profile.user.username }}</h1>
+    
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <p>
+            <label for="id_bio">Bio:</label><br>
+            <textarea name="bio" id="id_bio" rows="4" cols="50">{{ profile.bio }}</textarea>
+        </p>
+        
+        <p>
+            <strong>Current Avatar:</strong><br>
+            {% if profile.avatar %}
+                <img src="{{ profile.avatar.url }}" alt="Avatar" class="avatar"><br>
+                <small>Current avatar</small>
+            {% else %}
+                <p>No avatar uploaded</p>
+            {% endif %}
+        </p>
+        
+        <p>
+            <label for="id_avatar">New Avatar:</label><br>
+            <input type="file" name="avatar" id="id_avatar">
+        </p>
+        
+        <button type="submit">Update Profile</button>
+        <a href="{% url 'myauth:user-detail' user_id=profile.user.id %}">Cancel</a>
+    </form>
+{% endblock %}

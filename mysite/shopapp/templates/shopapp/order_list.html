@@ -5,39 +5,138 @@
 {% endblock %}
 
 {% block body %}
-    <h1>Orders:</h1>
-
-    {% if object_list %}
-        <div>
-            {% for order in object_list %}
-            <div>
-                <div><a href="{% url 'shopapp:order_details' pk=order.pk %}">Order #{{ order.pk }}</a></div>
-                <br>
-                <div><span style="color: blue;">Order by</span> {{ order.user.username }}</div>
-                <div><span style="color: blue;">Promocode</span>: <code>{{ order.promocode }}</code></div>
-                <div><span style="color: blue;">Delivery address</span>: {{ order.delivery_address }}</div>
-                <div>
-                    <span style="color: blue;">Product in order</span>:
-                    <ul>
-                        {% for product in order.products.all %}
-                            <li>{{ product.name }} for ${{ product.price }}</li>
-                        {% endfor %}
-                    </ul>
-                </div>
-                <br>
-            {% endfor %}
-
-            </div>
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="text-primary">
+                <i class="bi bi-list-check"></i>
+                Orders List
+            </h1>
+            <a href="{% url 'shopapp:create_order' %}" class="btn btn-success btn-lg">
+                <i class="bi bi-plus-circle"></i>
+                Create New Order
+            </a>
         </div>
-    {% else %}
-        <h3>No orders yet</h3>
-    {% endif %}
 
-    <div style="margin-bottom: 20px;">
-        <a href="{% url 'shopapp:create_order' %}" style="background-color: #28a745; color: white; padding: 10px 15px; text-decoration: none; border-radius: 5px;">
-            <i class="bi bi-plus"></i>
-            Create new order
-        </a>
+        {% if object_list %}
+            <div class="row">
+                {% for order in object_list %}
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card shadow-sm h-100">
+                            <div class="card-header bg-primary text-white">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5 class="card-title mb-0">
+                                        <i class="bi bi-receipt"></i>
+                                        Order #{{ order.pk }}
+                                    </h5>
+                                    <span class="badge bg-light text-dark">
+                                        <i class="bi bi-cart"></i>
+                                        {{ order.products.count }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="bi bi-person me-2 text-secondary"></i>
+                                        <strong class="me-2">Customer:</strong>
+                                        <span class="text-dark">{{ order.user.username }}</span>
+                                    </div>
+
+                                    {% if order.promocode %}
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="bi bi-tag me-2 text-success"></i>
+                                        <strong class="me-2">Promocode:</strong>
+                                        <code class="bg-light p-1 rounded">{{ order.promocode }}</code>
+                                    </div>
+                                    {% endif %}
+
+                                    <div class="d-flex align-items-start mb-3">
+                                        <i class="bi bi-geo-alt me-2 text-warning mt-1"></i>
+                                        <div>
+                                            <strong class="me-2">Address:</strong>
+                                            <span class="text-muted">{{ order.delivery_address|default:"Not specified" }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="products-section">
+                                    <h6 class="border-bottom pb-2">
+                                        <i class="bi bi-box-seam"></i>
+                                        Products ({{ order.products.count }}):
+                                    </h6>
+                                    <ul class="list-group list-group-flush">
+                                        {% for product in order.products.all %}
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                <span class="product-name">{{ product.name }}</span>
+                                                <span class="badge bg-primary rounded-pill">${{ product.price }}</span>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="card-footer bg-transparent">
+                                <div class="d-grid">
+                                    <a href="{% url 'shopapp:order_details' pk=order.pk %}"
+                                       class="btn btn-outline-primary btn-sm">
+                                        <i class="bi bi-eye"></i>
+                                        View Details
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center py-5">
+                <div class="empty-state">
+                    <i class="bi bi-cart-x display-1 text-muted"></i>
+                    <h3 class="text-muted mt-3">No Orders Yet</h3>
+                    <p class="text-muted">Create your first order to get started!</p>
+                    <a href="{% url 'shopapp:create_order' %}" class="btn btn-primary btn-lg mt-3">
+                        <i class="bi bi-plus-circle"></i>
+                        Create First Order
+                    </a>
+                </div>
+            </div>
+        {% endif %}
     </div>
 
+    <style>
+        .card {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            border: none;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
+        }
+
+        .product-name {
+            font-size: 0.9rem;
+        }
+
+        .empty-state {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .card-header {
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+        }
+
+        .products-section {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .list-group-item {
+            border: none;
+            padding: 0.5rem 0;
+            font-size: 0.85rem;
+        }
+    </style>
 {% endblock %}

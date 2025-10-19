@@ -2,7 +2,7 @@
 
 {% block title %}
     {% if access_denied %}
-        Доступ запрещен
+        Access Denied
     {% else %}
         Order #{{ order.pk }}
     {% endif %}
@@ -10,36 +10,157 @@
 
 {% block body %}
     {% if access_denied %}
-        <div style="text-align: center; margin: 50px;">
-            <h1>⚠️ Доступ запрещен</h1>
-            <p>Вы можете просматривать только свои заказы.</p>
-            <a href="{% url 'shopapp:order_list' %}">Вернуться к списку заказов</a>
+        <div class="container mt-5">
+            <div class="row justify-content-center">
+                <div class="col-md-6 text-center">
+                    <div class="card shadow-sm border-danger">
+                        <div class="card-header bg-danger text-white">
+                            <h2 class="card-title h4 mb-0">
+                                <i class="bi bi-shield-exclamation"></i>
+                                Access Denied
+                            </h2>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-4">
+                                <i class="bi bi-person-x" style="font-size: 4rem; color: #dc3545;"></i>
+                            </div>
+                            <p class="lead">You can only view your own orders.</p>
+                            <a href="{% url 'shopapp:order_list' %}" class="btn btn-primary">
+                                <i class="bi bi-arrow-left"></i>
+                                Back to Orders List
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     {% else %}
-        <h1>Order <strong>#{{ order.pk }}</strong></h1>
-        <div>
-            <div><span style="color: blue;">Delivery address</span>: <em>{{ order.delivery_address }}</em></div>
-            <div><span style="color: blue;">Promocode</span>: <strong>{{ order.promocode }}</strong></div>
-            <div><span style="color: blue;">User</span>: {{ order.user.username }}</div>
-            <div><span style="color: blue;">Archived</span>: {{ order.archived }}</div>
-            <div><span style="color: blue;">Products in order</span>:</div>
-            <ul>
-                {% for product in order.products.all %}
-                    <li>{{ product.name }} for ${{ product.price }}</li>
-                {% endfor %}
-            </ul>
-        </div>
-        <br>
-        <div>
-            <a href="{% url 'shopapp:order_update' pk=order.pk %}">Update order</a>
-        </div>
-        <br>
-        <div>
-            <a href="{% url 'shopapp:order_delete' pk=order.pk %}">Archive order</a>
-        </div>
-        <br>
-        <div>
-            <a href="{% url 'shopapp:order_list' %}">Back to orders list</a>
+        <div class="container mt-4">
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h1 class="display-6">Order <strong class="text-primary">#{{ order.pk }}</strong></h1>
+                        <span class="badge {% if order.archived %}bg-secondary{% else %}bg-success{% endif %} fs-6">
+                            {% if order.archived %}Archived{% else %}Active{% endif %}
+                        </span>
+                    </div>
+
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-header bg-light">
+                            <h3 class="card-title h5 mb-0">
+                                <i class="bi bi-info-circle"></i>
+                                Order Information
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <span class="fw-bold text-primary">Delivery Address:</span>
+                                        <p class="mt-1 mb-0"><em>{{ order.delivery_address }}</em></p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <span class="fw-bold text-primary">Promocode:</span>
+                                        <span class="badge bg-info text-dark">{{ order.promocode|default:"No promocode" }}</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <span class="fw-bold text-primary">User:</span>
+                                        <div class="d-flex align-items-center mt-1">
+                                            <i class="bi bi-person-circle me-2"></i>
+                                            {{ order.user.username }}
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <span class="fw-bold text-primary">Status:</span>
+                                        <span class="badge {% if order.archived %}bg-secondary{% else %}bg-success{% endif %}">
+                                            {{ order.archived|yesno:"Archived,Active" }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-light">
+                            <h3 class="card-title h5 mb-0">
+                                <i class="bi bi-cart-check"></i>
+                                Products in Order ({{ order.products.count }})
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Product Name</th>
+                                            <th class="text-end">Price</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for product in order.products.all %}
+                                            <tr>
+                                                <td>
+                                                    <i class="bi bi-box me-2"></i>
+                                                    {{ product.name }}
+                                                </td>
+                                                <td class="text-end fw-bold">{{ product.price }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                    {% if order.products.all %}
+                                    <tfoot class="table-light">
+                                        <tr>
+                                            <td class="fw-bold">Total:</td>
+                                            <td class="text-end fw-bold text-primary">
+                                                {{ order.get_total_price }}
+                                            </td>
+                                        </tr>
+                                    </tfoot>
+                                    {% endif %}
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    {# Кнопки действий #}
+                    <div class="mt-4">
+                        <div class="d-flex gap-2 flex-wrap">
+                            <a href="{% url 'shopapp:order_update' pk=order.pk %}" class="btn btn-warning">
+                                <i class="bi bi-pencil-square"></i>
+                                Update Order
+                            </a>
+                            <a href="{% url 'shopapp:order_delete' pk=order.pk %}" class="btn btn-danger">
+                                <i class="bi bi-archive"></i>
+                                Archive Order
+                            </a>
+                            <a href="{% url 'shopapp:order_list' %}" class="btn btn-primary">
+                                <i class="bi bi-arrow-left"></i>
+                                Back to Orders List
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     {% endif %}
+
+    <style>
+        .card {
+            border: none;
+            border-radius: 10px;
+        }
+        .card-header {
+            border-radius: 10px 10px 0 0 !important;
+        }
+        .table th {
+            border-top: none;
+            font-weight: 600;
+        }
+        .badge {
+            font-size: 0.8em;
+        }
+    </style>
 {% endblock %}

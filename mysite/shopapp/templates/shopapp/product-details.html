@@ -5,41 +5,115 @@
 {% endblock %}
 
 {% block body %}
-    <h1>Product <strong>{{ product.name }}</strong></h1>
-    <div>
-        <div><span style="color: blue;">Description</span>: <em>{{ product.description }}</em></div>
-        <div><span style="color: blue;">Price</span>: {{ product.price }}</div>
-        <div><span style="color: blue;">Discount</span>: {{ product.discount }}</div>
-        <div><span style="color: blue;">Archived</span>: {{ product.archived }}</div>
-        <div><span style="color: blue;">Created by</span>: {{ product.created_by.username }}</div>
-    </div>
-    <br>
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-8">
+                <h1>Product <strong class="text-primary">{{ product.name }}</strong></h1>
 
-    {# Проверка прав на редактирование: суперпользователь ИЛИ автор с правом изменения #}
-    {% if user.is_superuser or product.created_by == user and perms.shopapp.change_product %}
-        <div class="ms-3 d-grid gap-2 d-md-block">
-            <a href="{% url 'shopapp:products_list' %}" class="btn btn-primary btn-lg">
-                <i class="bi bi-arrow-clockwise"></i>
-                Update product
-            </a>
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <span class="fw-bold text-primary">Description:</span>
+                                    <p class="mt-1"><em>{{ product.description }}</em></p>
+                                </div>
+                                <div class="mb-2">
+                                    <span class="fw-bold text-primary">Price:</span> ${{ product.price }}
+                                </div>
+                                <div class="mb-2">
+                                    <span class="fw-bold text-primary">Discount:</span> {{ product.discount }}%
+                                </div>
+                                <div class="mb-2">
+                                    <span class="fw-bold text-primary">Archived:</span>
+                                    <span class="badge {% if product.archived %}bg-danger{% else %}bg-success{% endif %}">
+                                        {{ product.archived|yesno:"Yes,No" }}
+                                    </span>
+                                </div>
+                                <div class="mb-2">
+                                    <span class="fw-bold text-primary">Created by:</span>
+                                    {{ product.created_by.username }}
+                                </div>
+                            </div>
+
+                            {% if product.preview %}
+                            <div class="col-md-6">
+                                <div class="text-center">
+                                    <img src="{{ product.preview.url }}" alt="{{ product.preview.name }}"
+                                         class="img-fluid rounded shadow-sm" style="max-height: 300px;">
+                                </div>
+                            </div>
+                            {% endif %}
+                            <div class="row mt-4">
+                                <div class="col-12">
+                                    <h3 class="text-primary">Product Images:</h3>
+                                    <div class="row">
+                                        {% for img in product.images.all %}
+                                            <div class="col-md-4 mb-3">
+                                                <div class="card h-100 shadow-sm">
+                                                    <img src="{{ img.image.url }}"
+                                                         alt="{{ img.description|default:product.name }}"
+                                                         class="card-img-top"
+                                                         style="height: 200px; object-fit: cover;">
+                                                    <div class="card-body">
+                                                        <p class="card-text text-muted">
+                                                            {{ img.description|default:"No description" }}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% empty %}
+                                            <div class="col-12">
+                                                <div class="alert alert-info">
+                                                    No images uploaded yet.
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {# Кнопки действий #}
+                <div class="mt-4">
+                    <div class="d-flex gap-2 flex-wrap">
+                        {# Проверка прав на редактирование #}
+                        {% if user.is_authenticated %}
+                            {% if user.is_superuser or product.created_by == user and perms.shopapp.change_product %}
+                                <a href="{% url 'shopapp:product_update' pk=product.pk %}" class="btn btn-warning btn-lg">
+                                    <i class="bi bi-pencil-square"></i>
+                                    Update Product
+                                </a>
+                            {% endif %}
+
+                            {# Проверка прав на архивирование #}
+                            {% if user.is_superuser or product.created_by == user and perms.shopapp.delete_product %}
+                                <a href="{% url 'shopapp:product_delete' pk=product.pk %}" class="btn btn-danger btn-lg">
+                                    <i class="bi bi-archive"></i>
+                                    Archive Product
+                                </a>
+                            {% endif %}
+                        {% endif %}
+
+                        <a href="{% url 'shopapp:products_list' %}" class="btn btn-primary btn-lg">
+                            <i class="bi bi-arrow-left"></i>
+                            Back to Products List
+                        </a>
+                    </div>
+                </div>
+            </div>
         </div>
-    {% endif %}
-    <br>
-    {# Проверка прав на архивирование: суперпользователь ИЛИ автор с правом удаления #}
-    {% if user.is_superuser or product.created_by == user and perms.shopapp.delete_product %}
-        <div class="ms-3 d-grid gap-2 d-md-block">
-        <a href="{% url 'shopapp:products_list' %}" class="btn btn-primary btn-lg">
-            <i class="bi bi-archive"></i>
-            Archive product
-        </a>
-    </div>
-    {% endif %}
-    <br>
-
-    <div class="ms-3 d-grid gap-2 d-md-block">
-        <a href="{% url 'shopapp:products_list' %}" class="btn btn-primary btn-lg">
-            🛍Back to products list🛍
-        </a>
     </div>
 
+    <style>
+        .card {
+            border: none;
+            border-radius: 10px;
+        }
+        .badge {
+            font-size: 0.9em;
+        }
+    </style>
 {% endblock %}

@@ -1,0 +1,97 @@
+{% extends "myauth/base.html" %}
+
+{% block title %}
+    User: {{ profile.user.username }}
+{% endblock %}
+
+{% block body %}
+<div class="container" style="max-width: 800px; margin: 0 auto; padding: 20px;">
+    <div class="profile-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 15px; margin-bottom: 30px; text-align: center;">
+        <div class="avatar-section" style="margin-bottom: 20px;">
+            {% if profile.avatar %}
+                <img src="{{ profile.avatar.url }}" alt="Avatar"
+                     style="width: 150px; height: 150px; border-radius: 50%; border: 5px solid white; object-fit: cover;">
+            {% else %}
+                <div style="width: 150px; height: 150px; border-radius: 50%; border: 5px solid white; background: rgba(255,255,255,0.2); display: inline-flex; align-items: center; justify-content: center;">
+                    <span style="font-size: 14px; color: white;">No avatar</span>
+                </div>
+            {% endif %}
+        </div>
+        <h1 style="margin: 10px 0 5px 0; font-size: 2em;">{{ profile.user.username }}</h1>
+        {% if profile.user.first_name or profile.user.last_name %}
+            <p style="font-size: 1.2em; opacity: 0.9; margin: 0;">
+                {{ profile.user.first_name }} {{ profile.user.last_name }}
+            </p>
+        {% endif %}
+    </div>
+
+    <div class="profile-info" style="background: white; border-radius: 15px; padding: 30px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+        <h2 style="color: #333; border-bottom: 2px solid #667eea; padding-bottom: 10px; margin-bottom: 20px;">Profile Information</h2>
+
+        <div class="info-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div class="info-item">
+                <label style="font-weight: bold; color: #667eea; display: block; margin-bottom: 5px;">Username</label>
+                <p style="margin: 0; padding: 10px; background: #f8f9fa; border-radius: 8px;">{{ profile.user.username }}</p>
+            </div>
+
+            <div class="info-item">
+                <label style="font-weight: bold; color: #667eea; display: block; margin-bottom: 5px;">Email</label>
+                <p style="margin: 0; padding: 10px; background: #f8f9fa; border-radius: 8px;">
+                    {{ profile.user.email|default:"Not specified" }}
+                </p>
+            </div>
+
+            <div class="info-item">
+                <label style="font-weight: bold; color: #667eea; display: block; margin-bottom: 5px;">First Name</label>
+                <p style="margin: 0; padding: 10px; background: #f8f9fa; border-radius: 8px;">
+                    {{ profile.user.first_name|default:"Not specified" }}
+                </p>
+            </div>
+
+            <div class="info-item">
+                <label style="font-weight: bold; color: #667eea; display: block; margin-bottom: 5px;">Last Name</label>
+                <p style="margin: 0; padding: 10px; background: #f8f9fa; border-radius: 8px;">
+                    {{ profile.user.last_name|default:"Not specified" }}
+                </p>
+            </div>
+        </div>
+
+        <div class="bio-section" style="margin-top: 20px;">
+            <label style="font-weight: bold; color: #667eea; display: block; margin-bottom: 10px;">Bio</label>
+            <div style="padding: 15px; background: #f8f9fa; border-radius: 8px; min-height: 80px;">
+                {% if profile.bio %}
+                    {{ profile.bio|linebreaks }}
+                {% else %}
+                    <p style="margin: 0; color: #6c757d; font-style: italic;">No bio provided</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="actions" style="margin-top: 30px; text-align: center;">
+        {% if user.is_staff or user == profile.user %}
+            <a href="{% url 'myauth:profile-update' user_id=profile.user.id %}"
+               style="display: inline-block; background: #667eea; color: white; padding: 12px 30px; text-decoration: none; border-radius: 25px; margin: 0 10px; transition: all 0.3s;">
+                ✏️ Edit Profile
+            </a>
+        {% endif %}
+
+        <a href="{% url 'myauth:users-list' %}"
+           style="display: inline-block; background: #6c757d; color: white; padding: 12px 30px; text-decoration: none; border-radius: 25px; margin: 0 10px; transition: all 0.3s;">
+            ← Back to Users
+        </a>
+    </div>
+</div>
+
+<style>
+    .info-item p:hover {
+        background: #e9ecef !important;
+        transition: background 0.3s;
+    }
+
+    a:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+</style>
+{% endblock %}

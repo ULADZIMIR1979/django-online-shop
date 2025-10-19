@@ -3,24 +3,106 @@
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}{% endblock %}</title>
+    <style>
+        .avatar { max-width: 200px; max-height: 200px; border-radius: 10px; }
+        .messages {
+            color: green;
+            margin: 10px 0;
+            padding: 10px;
+            background: #d4edda;
+            border-radius: 5px;
+        }
+        .user-list { list-style: none; padding: 0; }
+        .user-item {
+            padding: 15px;
+            border-bottom: 1px solid #ddd;
+            transition: background 0.3s;
+        }
+        .user-item:hover { background: #f8f9fa; }
+
+        /* Improved navigation */
+        nav {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 15px 20px;
+            margin-bottom: 30px;
+            border-radius: 0 0 15px 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        nav a, nav span {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: 500;
+        }
+
+        nav form {
+            display: inline;
+        }
+
+        nav button {
+            background: rgba(255,255,255,0.2);
+            border: 1px solid white;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        nav button:hover {
+            background: white;
+            color: #667eea;
+        }
+
+        nav a:hover {
+            text-decoration: underline;
+        }
+
+        .admin-link {
+            background: rgba(255,255,255,0.3);
+            padding: 5px 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.5);
+        }
+    </style>
 </head>
 <body>
-    <nav style="background: #f0f0f0; padding: 10px; margin-bottom: 20px;">
+    <nav>
         {% if user.is_authenticated %}
-            <span>Hello, {{ user.username }}!</span>
-            <a href="{% url 'myauth:about-me' %}">Profile</a>
+            <span>👋 Hello, {{ user.username }}</span>
+            {% if user.is_staff %}
+                <span style="background: #ff6b6b; padding: 2px 8px; border-radius: 10px; font-size: 0.8em;">ADMIN</span>
+            {% endif %}
+            <a href="{% url 'myauth:about-me' %}">🏠 My Profile</a>
+
+            <!-- Ссылка на всех пользователей - всегда видна для авторизованных -->
+            <a href="{% url 'myauth:users-list' %}">👥 All Users</a>
+
+            <!-- Дополнительная админская ссылка -->
+            {% if user.is_staff %}
+                <a href="{% url 'myauth:users-list' %}" class="admin-link">⚡ Manage Users</a>
+                <a href="/admin/" class="admin-link">🔧 Django Admin</a>
+            {% endif %}
 
             <!-- Форма для выхода -->
-            <form method="post" action="{% url 'myauth:logout' %}" style="display: inline;">
+            <form method="post" action="{% url 'myauth:logout' %}">
                 {% csrf_token %}
-                <button type="submit">Logout</button>
+                <button type="submit">🚪 Logout</button>
             </form>
         {% else %}
-            <a href="{% url 'myauth:login' %}">Login</a>
-            <br>
-            <a href="{% url 'myauth:register' %}">Register</a>
+            <a href="{% url 'myauth:login' %}">🔑 Login</a>
+            <a href="{% url 'myauth:register' %}">📝 Register</a>
         {% endif %}
     </nav>
+
+    {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <div>{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
 
     {% block body %}{% endblock %}
 </body>

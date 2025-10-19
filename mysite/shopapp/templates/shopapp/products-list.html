@@ -29,6 +29,11 @@
                     <div><span style="color: blue;">Archived</span>: {{ product.archived }}</div>
                     <div><span style="color: blue;">Created by</span>: {{ product.created_by.username }}</div>
 
+                    <div>
+                        {% if product.preview %}
+                            <img src="{{ product.preview.url }}" alt="{{ product.preview.name }}">
+                        {% endif %}
+                    </div>
                     {# Кнопка редактирования только для автора или суперпользователя #}
                     {% if user.is_superuser or product.created_by == user and perms.shopapp.change_product %}
                         <div style="margin-top: 10px;">

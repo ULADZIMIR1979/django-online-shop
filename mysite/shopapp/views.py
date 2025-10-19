@@ -14,7 +14,7 @@ from django.contrib.auth.decorators import user_passes_test
 from django.utils.decorators import method_decorator
 
 from .forms import ProductForm, OrderForm, GroupForm
-from .models import Product, Order
+from .models import Product, Order, ProductImage
 
 
 class ShopIndexView(View):
@@ -48,7 +48,8 @@ class GroupsListView(View):
 
 class ProductDetailsView(DetailView):
     template_name = 'shopapp/product-details.html'
-    model = Product
+    # model = Product
+    queryset = Product.objects.prefetch_related("images")
     context_object_name = 'product'
 
 
@@ -61,7 +62,7 @@ class ProductsListView(ListView):
 class ProductCreateView(PermissionRequiredMixin, CreateView):
     permission_required = 'shopapp.add_product'
     model = Product
-    fields = "name", "price", "description", "discount"
+    fields = "name", "price", "description", "discount", "preview"
     success_url = reverse_lazy('shopapp:products_list')
 
     def form_valid(self, form):
@@ -71,8 +72,9 @@ class ProductCreateView(PermissionRequiredMixin, CreateView):
 
 class ProductUpdateView(UserPassesTestMixin, UpdateView):
     model = Product
-    fields = "name", "price", "description", "discount"
+    # fields = "name", "price", "description", "discount", "preview"
     template_name_suffix = '_update_form'
+    form_class = ProductForm
 
     def test_func(self):
         product = self.get_object()
@@ -88,6 +90,15 @@ class ProductUpdateView(UserPassesTestMixin, UpdateView):
             'shopapp:product_details',
             kwargs={"pk": self.object.pk},
         )
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        for image in form.files.getlist('images'):
+            ProductImage.objects.create(
+                product=self.object,
+                image=image,
+            )
+        return response
 
 
 class ProductDeleteView(DeleteView):
