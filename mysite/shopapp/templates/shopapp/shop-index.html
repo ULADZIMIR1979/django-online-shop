@@ -1,12 +1,17 @@
 {% extends "shopapp/base.html" %}
 {% load static %}
+{% load i18n %}
 
 {% block title %}
-    Shop Index | Products: {{ products|length }}
+    {% blocktranslate count products_count=products|length %}
+        Shop Index | Product: {{ products_count }}
+    {% plural %}
+        Shop Index | Products: {{ products_count }}
+    {% endblocktranslate %}
 {% endblock %}
 
 {% block body %}
-    <h1>Hello Shop Index!</h1>
+    <h1>{% translate 'Hello Shop Index!' %}</h1>
 
     {% comment "Информация о разделе" %}
         Этот раздел отображает каталог продуктов магазина
@@ -14,14 +19,20 @@
     {% endcomment %}
 
     <div>
-        <h2>Our Products (Total: {{ products|length }})</h2>
+        <h2>
+            {% blocktranslate count products_count=products|length %}
+                Our Product (Total: {{ products_count }})
+            {% plural %}
+                Our Products (Total: {{ products_count }})
+            {% endblocktranslate %}
+        </h2>
         <ul>
             {% for product in products %}
             <li>
-                <strong>{{ product.name|upper }}</strong> for ${{ product.price }} ← Длина: {{ product.name|length }} символов
+                <strong>{{ product.name|upper }}</strong> {% blocktranslate with price=product.price name_length=product.name|length %}for ${{ price }} ← Length: {{ name_length }} characters{% endblocktranslate %}
             </li>
             {% empty %}
-            <li>No products available at the moment.</li>
+            <li>{% translate 'No products available at the moment.' %}</li>
             {% endfor %}
         </ul>
     </div>
@@ -31,12 +42,16 @@
     {% with products|dictsort:"price"|first as cheapest %}
 
     <div style="background-color: #f0f8ff; padding: 10px; margin: 10px 0; border-radius: 5px;">
-        <h3>📊 Статистика магазина:</h3>
-        <p>Самый дорогой товар:
-        <strong>{{ most_expensive.name|upper }} for ${{ most_expensive.price }}</strong>
+        <h3>📊 {% translate 'Shop Statistics' %}:</h3>
+        <p>
+            {% blocktranslate with product_name=most_expensive.name|upper price=most_expensive.price %}
+                Most expensive product: <strong>{{ product_name }} for ${{ price }}</strong>
+            {% endblocktranslate %}
         </p>
-        <p>Самый дешевый товар:
-        <strong>{{ cheapest.name|upper }} for ${{ cheapest.price }}</strong>
+        <p>
+            {% blocktranslate with product_name=cheapest.name|upper price=cheapest.price %}
+                Cheapest product: <strong>{{ product_name }} for ${{ price }}</strong>
+            {% endblocktranslate %}
         </p>
     </div>
     {% endwith %}
@@ -44,19 +59,23 @@
 
     {% if products %}
         <div style="background-color: #e8f5e8; padding: 10px; border-radius: 5px;">
-            <p>✅ В наличии: {{ products|length }} товар(ов)</p>
+            <p>
+                {% blocktranslate count products_count=products|length %}
+                    ✅ In stock: {{ products_count }} product
+                {% plural %}
+                    ✅ In stock: {{ products_count }} products
+                {% endblocktranslate %}
+            </p>
         </div>
     {% else %}
         <div style="background-color: #fff0f0; padding: 10px;">
-            <p>⚠️ Внимание: продуктов нет в наличии!</p>
+            <p>⚠️ {% translate 'Warning: no products available!' %}</p>
         </div>
     {% endif %}
 
     <div>
-        <h3>📝 Описание магазина:</h3>
-        <p>Мы предлагаем широкий ассортимент электроники по конкурентным ценам.
-           Каждый товар проходит тщательную проверку качества.</p>
+        <h3>📝 {% translate 'Shop Description' %}:</h3>
+        <p>{% translate 'We offer a wide range of electronics at competitive prices. Each product undergoes thorough quality control.' %}</p>
     </div>
-
 
 {% endblock %}

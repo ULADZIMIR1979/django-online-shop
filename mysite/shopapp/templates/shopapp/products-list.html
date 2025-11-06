@@ -1,33 +1,44 @@
 {% extends "shopapp/base.html" %}
 
+{% load i18n %}
+
 {% block title %}
-    Products List
+    {% translate 'Products list' %}
 {% endblock %}
 
 {% block body %}
-    <h1>Products:</h1>
+    <h1>{% translate 'Products' %}:</h1>
 
     {# ИСПРАВЛЕННАЯ ПРОВЕРКА ПРАВ - используем стандартное разрешение Django #}
     {% if perms.shopapp.add_product %}
         <div style="margin-bottom: 20px;">
             <a href="{% url 'shopapp:product_create' %}" style="background-color: #28a745; color: white; padding: 10px 15px; text-decoration: none; border-radius: 5px;">
                 <i class="bi bi-plus"></i>
-                Create a new product
+                {% translate 'Create a new product' %}
             </a>
         </div>
     {% endif %}
 
     {% if products %}
         <div>
+            {% blocktranslate count products_count=products|length %}
+                There is only one product.
+                {% plural %}
+                There are {{ products_count }} products.
+            {% endblocktranslate %}
+        </div>
+        <div>
             {% for product in products %}
                 <div style="border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 5px;">
                     <div>
-                        <a href="{% url 'shopapp:product_details' pk=product.pk %}"><strong>{{ product.name }}</strong></a>
+                        <a href="{% url 'shopapp:product_details' pk=product.pk %}"
+                        >{% translate 'Name' context 'product name' %}: <strong>{{ product.name }}</strong></a>
                     </div>
-                    <div><span style="color: blue;">Price</span>: {{ product.price }}</div>
-                    <div><span style="color: blue;">Discount</span>: {% firstof product.discount 'no discount' %}</div>
-                    <div><span style="color: blue;">Archived</span>: {{ product.archived }}</div>
-                    <div><span style="color: blue;">Created by</span>: {{ product.created_by.username }}</div>
+                    <div><span style="color: blue;">{% translate 'Price' context 'product price' %}</span>: {{ product.price }}</div>
+                    {% translate 'no discount' as no_discount %}
+                    <div><span style="color: blue;">{% translate 'Discount' %}</span>: {% firstof product.discount no_discount %}</div>
+                    <div><span style="color: blue;">{% translate 'Archived' context 'product status' %}</span>: {{ product.archived }}</div>
+                    <div><span style="color: blue;">{% translate 'Created by' context 'product author' %}</span>: {{ product.created_by.username }}</div>
 
                     <div>
                         {% if product.preview %}
@@ -46,12 +57,17 @@
             {% endfor %}
         </div>
     {% else %}
+        {% url 'shopapp:product_create' as create_product_url %}
+        {% blocktranslate %}
         <h3>No products yet</h3>
+        <a href="{{ create_product_url }}" style="background-color: #28a745; color: white; padding: 10px 15px; text-decoration: none; border-radius: 5px;"
+        >Create a new one</a>
+        {% endblocktranslate %}
     {% endif %}
     <div class="ms-3 d-grid gap-2 d-md-block">
         <a href="{% url 'shopapp:index' %}" class="btn btn-primary btn-lg">
             <i class="bi bi-cart3"></i>
-            Back to shop
+            {% translate 'Back to shop' %}
         </a>
     </div>
 

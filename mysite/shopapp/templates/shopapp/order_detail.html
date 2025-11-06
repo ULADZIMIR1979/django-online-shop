@@ -1,10 +1,11 @@
 {% extends "shopapp/base.html" %}
+{% load i18n %}
 
 {% block title %}
     {% if access_denied %}
-        Access Denied
+        {% translate 'Access Denied' %}
     {% else %}
-        Order #{{ order.pk }}
+        {% blocktranslate with order_number=order.pk %}Order #{{ order_number }}{% endblocktranslate %}
     {% endif %}
 {% endblock %}
 
@@ -17,17 +18,17 @@
                         <div class="card-header bg-danger text-white">
                             <h2 class="card-title h4 mb-0">
                                 <i class="bi bi-shield-exclamation"></i>
-                                Access Denied
+                                {% translate 'Access Denied' %}
                             </h2>
                         </div>
                         <div class="card-body">
                             <div class="mb-4">
                                 <i class="bi bi-person-x" style="font-size: 4rem; color: #dc3545;"></i>
                             </div>
-                            <p class="lead">You can only view your own orders.</p>
+                            <p class="lead">{% translate 'You can only view your own orders.' %}</p>
                             <a href="{% url 'shopapp:order_list' %}" class="btn btn-primary">
                                 <i class="bi bi-arrow-left"></i>
-                                Back to Orders List
+                                {% translate 'Back to Orders List' %}
                             </a>
                         </div>
                     </div>
@@ -39,9 +40,9 @@
             <div class="row">
                 <div class="col-md-8">
                     <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h1 class="display-6">Order <strong class="text-primary">#{{ order.pk }}</strong></h1>
+                        <h1 class="display-6">{% blocktranslate with order_number=order.pk %}Order <strong class="text-primary">#{{ order_number }}</strong>{% endblocktranslate %}</h1>
                         <span class="badge {% if order.archived %}bg-secondary{% else %}bg-success{% endif %} fs-6">
-                            {% if order.archived %}Archived{% else %}Active{% endif %}
+                            {% if order.archived %}{% translate 'Archived' %}{% else %}{% translate 'Active' %}{% endif %}
                         </span>
                     </div>
 
@@ -49,33 +50,33 @@
                         <div class="card-header bg-light">
                             <h3 class="card-title h5 mb-0">
                                 <i class="bi bi-info-circle"></i>
-                                Order Information
+                                {% translate 'Order Information' %}
                             </h3>
                         </div>
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="mb-3">
-                                        <span class="fw-bold text-primary">Delivery Address:</span>
+                                        <span class="fw-bold text-primary">{% translate 'Delivery Address' %}:</span>
                                         <p class="mt-1 mb-0"><em>{{ order.delivery_address }}</em></p>
                                     </div>
                                     <div class="mb-3">
-                                        <span class="fw-bold text-primary">Promocode:</span>
-                                        <span class="badge bg-info text-dark">{{ order.promocode|default:"No promocode" }}</span>
+                                        <span class="fw-bold text-primary">{% translate 'Promocode' %}:</span>
+                                        <span class="badge bg-info text-dark">{{ order.promocode|default:_("No promocode") }}</span>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="mb-3">
-                                        <span class="fw-bold text-primary">User:</span>
+                                        <span class="fw-bold text-primary">{% translate 'User' %}:</span>
                                         <div class="d-flex align-items-center mt-1">
                                             <i class="bi bi-person-circle me-2"></i>
                                             {{ order.user.username }}
                                         </div>
                                     </div>
                                     <div class="mb-3">
-                                        <span class="fw-bold text-primary">Status:</span>
+                                        <span class="fw-bold text-primary">{% translate 'Status' %}:</span>
                                         <span class="badge {% if order.archived %}bg-secondary{% else %}bg-success{% endif %}">
-                                            {{ order.archived|yesno:"Archived,Active" }}
+                                            {{ order.archived|yesno:_("Archived,Active") }}
                                         </span>
                                     </div>
                                 </div>
@@ -87,7 +88,11 @@
                         <div class="card-header bg-light">
                             <h3 class="card-title h5 mb-0">
                                 <i class="bi bi-cart-check"></i>
-                                Products in Order ({{ order.products.count }})
+                                {% blocktranslate count product_count=order.products.count %}
+                                    Product in Order ({{ product_count }})
+                                {% plural %}
+                                    Products in Order ({{ product_count }})
+                                {% endblocktranslate %}
                             </h3>
                         </div>
                         <div class="card-body">
@@ -95,8 +100,8 @@
                                 <table class="table table-hover">
                                     <thead class="table-light">
                                         <tr>
-                                            <th>Product Name</th>
-                                            <th class="text-end">Price</th>
+                                            <th>{% translate 'Product Name' %}</th>
+                                            <th class="text-end">{% translate 'Price' %}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -113,7 +118,7 @@
                                     {% if order.products.all %}
                                     <tfoot class="table-light">
                                         <tr>
-                                            <td class="fw-bold">Total:</td>
+                                            <td class="fw-bold">{% translate 'Total' %}:</td>
                                             <td class="text-end fw-bold text-primary">
                                                 {{ order.get_total_price }}
                                             </td>
@@ -130,15 +135,15 @@
                         <div class="d-flex gap-2 flex-wrap">
                             <a href="{% url 'shopapp:order_update' pk=order.pk %}" class="btn btn-warning">
                                 <i class="bi bi-pencil-square"></i>
-                                Update Order
+                                {% translate 'Update Order' %}
                             </a>
                             <a href="{% url 'shopapp:order_delete' pk=order.pk %}" class="btn btn-danger">
                                 <i class="bi bi-archive"></i>
-                                Archive Order
+                                {% translate 'Archive Order' %}
                             </a>
                             <a href="{% url 'shopapp:order_list' %}" class="btn btn-primary">
                                 <i class="bi bi-arrow-left"></i>
-                                Back to Orders List
+                                {% translate 'Back to Orders List' %}
                             </a>
                         </div>
                     </div>

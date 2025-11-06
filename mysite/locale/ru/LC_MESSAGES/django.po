@@ -1,0 +1,500 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-11-06 19:16+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+#: myauth/views.py:17
+msgid "Hello world!"
+msgstr "Привет, Мир!"
+
+#: myauth/views.py:22
+#, python-brace-format
+msgid "one product"
+msgid_plural "{count} products"
+msgstr[0] "{count} товар"
+msgstr[1] "{count} товара"
+msgstr[2] "{count} товаров"
+
+#: mysite/settings.py:140
+msgid "English"
+msgstr "Английский"
+
+#: mysite/settings.py:141
+msgid "Russian"
+msgstr "Русский"
+
+#: shopapp/models.py:16
+msgid "Product"
+msgstr "Товар"
+
+#: shopapp/models.py:17 shopapp/templates/shopapp/products-list.html:10
+msgid "Products"
+msgstr "Товары"
+
+#: shopapp/models.py:58
+msgid "Order"
+msgstr "Заказ"
+
+#: shopapp/models.py:59
+msgid "Orders"
+msgstr "Заказы"
+
+#: shopapp/templates/shopapp/order_detail.html:6
+#: shopapp/templates/shopapp/order_detail.html:21
+msgid "Access Denied"
+msgstr "Доступ запрещен"
+
+#: shopapp/templates/shopapp/order_detail.html:8
+#: shopapp/templates/shopapp/order_list.html:30
+#, python-format
+msgid "Order #%(order_number)s"
+msgstr "Заказ #%(order_number)s"
+
+#: shopapp/templates/shopapp/order_detail.html:28
+msgid "You can only view your own orders."
+msgstr "Вы можете просматривать только свои заказы."
+
+#: shopapp/templates/shopapp/order_detail.html:31
+#: shopapp/templates/shopapp/order_detail.html:146
+msgid "Back to Orders List"
+msgstr "Назад к списку заказов"
+
+#: shopapp/templates/shopapp/order_detail.html:43
+#, python-format
+msgid "Order <strong class=\"text-primary\">#%(order_number)s</strong>"
+msgstr "Заказ <strong class=\"text-primary\">#%(order_number)s</strong>"
+
+#: shopapp/templates/shopapp/order_detail.html:45
+#: shopapp/templates/shopapp/product-details.html:29
+msgid "Archived"
+msgstr "Архивирован"
+
+#: shopapp/templates/shopapp/order_detail.html:45
+msgid "Active"
+msgstr "Активен"
+
+#: shopapp/templates/shopapp/order_detail.html:53
+msgid "Order Information"
+msgstr "Информация о заказе"
+
+#: shopapp/templates/shopapp/order_detail.html:60
+msgid "Delivery Address"
+msgstr "Адрес доставки"
+
+#: shopapp/templates/shopapp/order_detail.html:64
+#: shopapp/templates/shopapp/order_list.html:50
+msgid "Promocode"
+msgstr "Промокод"
+
+#: shopapp/templates/shopapp/order_detail.html:65
+msgid "No promocode"
+msgstr "Нет промокода"
+
+#: shopapp/templates/shopapp/order_detail.html:70
+msgid "User"
+msgstr "Пользователь"
+
+#: shopapp/templates/shopapp/order_detail.html:77
+msgid "Status"
+msgstr "Статус"
+
+#: shopapp/templates/shopapp/order_detail.html:79
+msgid "Archived,Active"
+msgstr "Архивирован,Активен"
+
+#: shopapp/templates/shopapp/order_detail.html:91
+#, python-format
+msgid ""
+"\n"
+"                                    Product in Order (%(product_count)s)\n"
+"                                "
+msgid_plural ""
+"\n"
+"                                    Products in Order (%(product_count)s)\n"
+"                                "
+msgstr[0] ""
+"\n"
+"                                    Товар в заказе (%(product_count)s)\n"
+"                                "
+msgstr[1] ""
+"\n"
+"                                    Товара в заказе (%(product_count)s)\n"
+"                                "
+msgstr[2] ""
+"\n"
+"                                    Товаров в заказе (%(product_count)s)\n"
+"                                "
+
+#: shopapp/templates/shopapp/order_detail.html:103
+msgid "Product Name"
+msgstr "Название товара"
+
+#: shopapp/templates/shopapp/order_detail.html:104
+#: shopapp/templates/shopapp/product-details.html:23
+msgid "Price"
+msgstr "Цена"
+
+#: shopapp/templates/shopapp/order_detail.html:121
+msgid "Total"
+msgstr "Итого"
+
+#: shopapp/templates/shopapp/order_detail.html:138
+msgid "Update Order"
+msgstr "Обновить заказ"
+
+#: shopapp/templates/shopapp/order_detail.html:142
+msgid "Archive Order"
+msgstr "Архивировать заказ"
+
+#: shopapp/templates/shopapp/order_list.html:5
+#: shopapp/templates/shopapp/order_list.html:13
+msgid "Orders List"
+msgstr "Список заказов"
+
+#: shopapp/templates/shopapp/order_list.html:17
+msgid "Create New Order"
+msgstr "Создать новый заказ"
+
+#: shopapp/templates/shopapp/order_list.html:43
+msgid "Customer"
+msgstr "Клиент"
+
+#: shopapp/templates/shopapp/order_list.html:58
+msgid "Address"
+msgstr "Адрес"
+
+#: shopapp/templates/shopapp/order_list.html:59
+msgid "Not specified"
+msgstr "Не указан"
+
+#: shopapp/templates/shopapp/order_list.html:67
+#, python-format
+msgid ""
+"\n"
+"                                            Product (%(product_count)s):\n"
+"                                        "
+msgid_plural ""
+"\n"
+"                                            Products (%(product_count)s):\n"
+"                                        "
+msgstr[0] ""
+"\n"
+"                                            Товар (%(product_count)s):\n"
+"                                        "
+msgstr[1] ""
+"\n"
+"                                            Товара (%(product_count)s):\n"
+"                                        "
+msgstr[2] ""
+"\n"
+"                                            Товаров (%(product_count)s):\n"
+"                                        "
+
+#: shopapp/templates/shopapp/order_list.html:89
+msgid "View Details"
+msgstr "Просмотреть детали"
+
+#: shopapp/templates/shopapp/order_list.html:101
+msgid "No Orders Yet"
+msgstr "Пока нет заказов"
+
+#: shopapp/templates/shopapp/order_list.html:102
+msgid "Create your first order to get started!"
+msgstr "Создайте свой первый заказ, чтобы начать!"
+
+#: shopapp/templates/shopapp/order_list.html:105
+msgid "Create First Order"
+msgstr "Создать первый заказ"
+
+#: shopapp/templates/shopapp/product-details.html:5
+#, python-format
+msgid "Product #%(product.pk)s - %(product_name)s"
+msgstr "Товар #%(product.pk)s - %(product_name)s"
+
+#: shopapp/templates/shopapp/product-details.html:12
+#, python-format
+msgid "Product <strong class=\"text-primary\">%(product_name)s</strong>"
+msgstr "Товар <strong class=\"text-primary\">%(product_name)s</strong>"
+
+#: shopapp/templates/shopapp/product-details.html:19
+msgid "Description"
+msgstr "Описание"
+
+#: shopapp/templates/shopapp/product-details.html:26
+#: shopapp/templates/shopapp/products-list.html:39
+msgid "Discount"
+msgstr "Скидка"
+
+#: shopapp/templates/shopapp/product-details.html:31
+msgid "Yes,No"
+msgstr "Да,Нет"
+
+#: shopapp/templates/shopapp/product-details.html:35
+msgid "Created by"
+msgstr "Создан"
+
+#: shopapp/templates/shopapp/product-details.html:50
+msgctxt "product details page"
+msgid "Product Images"
+msgstr "Изображения товара"
+
+#: shopapp/templates/shopapp/product-details.html:61
+msgid "No description"
+msgstr "Нет описания"
+
+#: shopapp/templates/shopapp/product-details.html:69
+msgid "No images uploaded yet."
+msgstr "Изображения еще не загружены."
+
+#: shopapp/templates/shopapp/product-details.html:82
+#, python-format
+msgid ""
+"\n"
+"                        There is %(images_count)s image available.\n"
+"                    "
+msgid_plural ""
+"\n"
+"                        There are %(images_count)s images available.\n"
+"                    "
+msgstr[0] ""
+"\n"
+"                        Доступно %(images_count)s изображение.\n"
+"                    "
+msgstr[1] ""
+"\n"
+"                        Доступно %(images_count)s изображения.\n"
+"                    "
+msgstr[2] ""
+"\n"
+"                        Доступно %(images_count)s изображений.\n"
+"                    "
+
+#: shopapp/templates/shopapp/product-details.html:97
+msgid "Update Product"
+msgstr "Обновить товар"
+
+#: shopapp/templates/shopapp/product-details.html:105
+msgid "Archive Product"
+msgstr "Архивировать товар"
+
+#: shopapp/templates/shopapp/product-details.html:112
+msgid "Back to Products List"
+msgstr "Назад к списку товаров"
+
+#: shopapp/templates/shopapp/products-list.html:6
+msgid "Products list"
+msgstr "Список товаров"
+
+#: shopapp/templates/shopapp/products-list.html:17
+msgid "Create a new product"
+msgstr "Создать новый товар"
+
+#: shopapp/templates/shopapp/products-list.html:24
+#, python-format
+msgid ""
+"\n"
+"                There is only one product.\n"
+"                "
+msgid_plural ""
+"\n"
+"                There are %(products_count)s products.\n"
+"            "
+msgstr[0] ""
+"\n"
+"                Доступен %(products_count)s товар.\n"
+"            "
+msgstr[1] ""
+"\n"
+"                Доступно %(products_count)s товара.\n"
+"            "
+msgstr[2] ""
+"\n"
+"                Доступно %(products_count)s товаров.\n"
+"            "
+
+#: shopapp/templates/shopapp/products-list.html:35
+msgctxt "product name"
+msgid "Name"
+msgstr "Название"
+
+#: shopapp/templates/shopapp/products-list.html:37
+msgctxt "product price"
+msgid "Price"
+msgstr "Цена"
+
+#: shopapp/templates/shopapp/products-list.html:38
+msgid "no discount"
+msgstr "нет скидки"
+
+#: shopapp/templates/shopapp/products-list.html:40
+msgctxt "product status"
+msgid "Archived"
+msgstr "Архивирован"
+
+#: shopapp/templates/shopapp/products-list.html:41
+msgctxt "product author"
+msgid "Created by"
+msgstr "Создан"
+
+#: shopapp/templates/shopapp/products-list.html:61
+#, python-format
+msgid ""
+"\n"
+"        <h3>No products yet</h3>\n"
+"        <a href=\"%(create_product_url)s\" style=\"background-color: "
+"#28a745; color: white; padding: 10px 15px; text-decoration: none; border-"
+"radius: 5px;\"\n"
+"        >Create a new one</a>\n"
+"        "
+msgstr ""
+"\n"
+"        <h3>Пока нет товаров</h3>\n"
+"        <a href=\"%(create_product_url)s\" style=\"background-color: "
+"#28a745; color: white; padding: 10px 15px; text-decoration: none; border-"
+"radius: 5px;\"\n"
+"        >Создать новый</a>\n"
+"        "
+
+#: shopapp/templates/shopapp/products-list.html:70
+msgid "Back to shop"
+msgstr "Вернуться в магазин"
+
+#: shopapp/templates/shopapp/shop-index.html:6
+#, python-format
+msgid ""
+"\n"
+"        Shop Index | Product: %(products_count)s\n"
+"    "
+msgid_plural ""
+"\n"
+"        Shop Index | Products: %(products_count)s\n"
+"    "
+msgstr[0] ""
+"\n"
+"        Главная магазина | Товар: %(products_count)s\n"
+"    "
+msgstr[1] ""
+"\n"
+"        Главная магазина | Товары: %(products_count)s\n"
+"    "
+msgstr[2] ""
+"\n"
+"        Главная магазина | Товаров: %(products_count)s\n"
+"    "
+
+#: shopapp/templates/shopapp/shop-index.html:14
+msgid "Hello Shop Index!"
+msgstr "Добро пожаловать в магазин!"
+
+#: shopapp/templates/shopapp/shop-index.html:23
+#, python-format
+msgid ""
+"\n"
+"                Our Product (Total: %(products_count)s)\n"
+"            "
+msgid_plural ""
+"\n"
+"                Our Products (Total: %(products_count)s)\n"
+"            "
+msgstr[0] ""
+"\n"
+"                Наш товар (Всего: %(products_count)s)\n"
+"            "
+msgstr[1] ""
+"\n"
+"                Наши товары (Всего: %(products_count)s)\n"
+"            "
+msgstr[2] ""
+"\n"
+"                Наших товаров (Всего: %(products_count)s)\n"
+"            "
+
+#: shopapp/templates/shopapp/shop-index.html:32
+#, python-format
+msgid "for $%(price)s ← Length: %(name_length)s characters"
+msgstr "за $%(price)s ← Длина: %(name_length)s символов"
+
+#: shopapp/templates/shopapp/shop-index.html:35
+msgid "No products available at the moment."
+msgstr "В данный момент товары отсутствуют."
+
+#: shopapp/templates/shopapp/shop-index.html:45
+msgid "Shop Statistics"
+msgstr "Статистика магазина"
+
+#: shopapp/templates/shopapp/shop-index.html:47
+#, python-format
+msgid ""
+"\n"
+"                Most expensive product: <strong>%(product_name)s for $"
+"%(price)s</strong>\n"
+"            "
+msgstr ""
+"\n"
+"                Самый дорогой товар: <strong>%(product_name)s за $%(price)s</strong>\n"
+"            "
+
+#: shopapp/templates/shopapp/shop-index.html:52
+#, python-format
+msgid ""
+"\n"
+"                Cheapest product: <strong>%(product_name)s for $%(price)s</"
+"strong>\n"
+"            "
+msgstr ""
+"\n"
+"                Самый дешевый товар: <strong>%(product_name)s за $%(price)s</strong>\n"
+"            "
+
+#: shopapp/templates/shopapp/shop-index.html:63
+#, python-format
+msgid ""
+"\n"
+"                    ✅ In stock: %(products_count)s product\n"
+"                "
+msgid_plural ""
+"\n"
+"                    ✅ In stock: %(products_count)s products\n"
+"                "
+msgstr[0] ""
+"\n"
+"                    ✅ В наличии: %(products_count)s товар\n"
+"                "
+msgstr[1] ""
+"\n"
+"                    ✅ В наличии: %(products_count)s товара\n"
+"                "
+msgstr[2] ""
+"\n"
+"                    ✅ В наличии: %(products_count)s товаров\n"
+"                "
+
+#: shopapp/templates/shopapp/shop-index.html:72
+msgid "Warning: no products available!"
+msgstr "⚠️ Внимание: продуктов нет в наличии!"
+
+#: shopapp/templates/shopapp/shop-index.html:77
+msgid "Shop Description"
+msgstr "Описание магазина"
+
+#: shopapp/templates/shopapp/shop-index.html:78
+msgid ""
+"We offer a wide range of electronics at competitive prices. Each product "
+"undergoes thorough quality control."
+msgstr "Мы предлагаем широкий ассортимент электроники по конкурентным ценам. Каждый товар проходит тщательную проверку качества."

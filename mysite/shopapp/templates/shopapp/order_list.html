@@ -1,7 +1,8 @@
 {% extends 'shopapp/base.html' %}
+{% load i18n %}
 
 {% block title %}
-    Orders List
+    {% translate 'Orders List' %}
 {% endblock %}
 
 {% block body %}
@@ -9,11 +10,11 @@
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h1 class="text-primary">
                 <i class="bi bi-list-check"></i>
-                Orders List
+                {% translate 'Orders List' %}
             </h1>
             <a href="{% url 'shopapp:create_order' %}" class="btn btn-success btn-lg">
                 <i class="bi bi-plus-circle"></i>
-                Create New Order
+                {% translate 'Create New Order' %}
             </a>
         </div>
 
@@ -26,7 +27,7 @@
                                 <div class="d-flex justify-content-between align-items-center">
                                     <h5 class="card-title mb-0">
                                         <i class="bi bi-receipt"></i>
-                                        Order #{{ order.pk }}
+                                        {% blocktranslate with order_number=order.pk %}Order #{{ order_number }}{% endblocktranslate %}
                                     </h5>
                                     <span class="badge bg-light text-dark">
                                         <i class="bi bi-cart"></i>
@@ -39,14 +40,14 @@
                                 <div class="mb-3">
                                     <div class="d-flex align-items-center mb-2">
                                         <i class="bi bi-person me-2 text-secondary"></i>
-                                        <strong class="me-2">Customer:</strong>
+                                        <strong class="me-2">{% translate 'Customer' %}:</strong>
                                         <span class="text-dark">{{ order.user.username }}</span>
                                     </div>
 
                                     {% if order.promocode %}
                                     <div class="d-flex align-items-center mb-2">
                                         <i class="bi bi-tag me-2 text-success"></i>
-                                        <strong class="me-2">Promocode:</strong>
+                                        <strong class="me-2">{% translate 'Promocode' %}:</strong>
                                         <code class="bg-light p-1 rounded">{{ order.promocode }}</code>
                                     </div>
                                     {% endif %}
@@ -54,8 +55,8 @@
                                     <div class="d-flex align-items-start mb-3">
                                         <i class="bi bi-geo-alt me-2 text-warning mt-1"></i>
                                         <div>
-                                            <strong class="me-2">Address:</strong>
-                                            <span class="text-muted">{{ order.delivery_address|default:"Not specified" }}</span>
+                                            <strong class="me-2">{% translate 'Address' %}:</strong>
+                                            <span class="text-muted">{{ order.delivery_address|default:_("Not specified") }}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -63,7 +64,11 @@
                                 <div class="products-section">
                                     <h6 class="border-bottom pb-2">
                                         <i class="bi bi-box-seam"></i>
-                                        Products ({{ order.products.count }}):
+                                        {% blocktranslate count product_count=order.products.count %}
+                                            Product ({{ product_count }}):
+                                        {% plural %}
+                                            Products ({{ product_count }}):
+                                        {% endblocktranslate %}
                                     </h6>
                                     <ul class="list-group list-group-flush">
                                         {% for product in order.products.all %}
@@ -81,7 +86,7 @@
                                     <a href="{% url 'shopapp:order_details' pk=order.pk %}"
                                        class="btn btn-outline-primary btn-sm">
                                         <i class="bi bi-eye"></i>
-                                        View Details
+                                        {% translate 'View Details' %}
                                     </a>
                                 </div>
                             </div>
@@ -93,11 +98,11 @@
             <div class="text-center py-5">
                 <div class="empty-state">
                     <i class="bi bi-cart-x display-1 text-muted"></i>
-                    <h3 class="text-muted mt-3">No Orders Yet</h3>
-                    <p class="text-muted">Create your first order to get started!</p>
+                    <h3 class="text-muted mt-3">{% translate 'No Orders Yet' %}</h3>
+                    <p class="text-muted">{% translate 'Create your first order to get started!' %}</p>
                     <a href="{% url 'shopapp:create_order' %}" class="btn btn-primary btn-lg mt-3">
                         <i class="bi bi-plus-circle"></i>
-                        Create First Order
+                        {% translate 'Create First Order' %}
                     </a>
                 </div>
             </div>
