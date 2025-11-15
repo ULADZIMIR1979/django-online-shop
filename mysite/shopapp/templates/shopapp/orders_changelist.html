@@ -1,0 +1,14 @@
+{% extends "admin/change_list.html" %}
+
+{% block object-tools %}
+  <div class="object-tools">
+    {% block object-tools-items %}
+      {{ block.super }}
+      <li>
+        <a href="{% url 'admin:import_orders' %}" class="addlink">
+          📥 Импорт заказов из файла
+        </a>
+      </li>
+    {% endblock %}
+  </div>
+{% endblock %}

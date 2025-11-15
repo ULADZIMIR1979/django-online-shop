@@ -7,16 +7,22 @@ from .models import Product, Order, ProductImage
 
 
 class GroupForm(forms.ModelForm):
+    """Форма для создания и редактирования групп пользователей."""
+
     class Meta:
         model = Group
         fields = "name",
 
 
 class MultipleFileInput(forms.ClearableFileInput):
+    """Виджет для загрузки нескольких файлов."""
+
     allow_multiple_selected = True
 
 
 class MultipleImageField(forms.ImageField):
+    """Поле для загрузки нескольких изображений."""
+
     def __init__(self, *args, **kwargs):
         kwargs.setdefault("widget", MultipleFileInput())
         super().__init__(*args, **kwargs)
@@ -31,6 +37,8 @@ class MultipleImageField(forms.ImageField):
 
 
 class ProductForm(forms.ModelForm):
+    """Форма для создания и редактирования товаров."""
+
     class Meta:
         model = Product
         fields = "name", "price", "description", "discount", "preview"
@@ -52,6 +60,8 @@ class ProductForm(forms.ModelForm):
 
 
 class OrderForm(forms.ModelForm):
+    """Форма для создания заказа."""
+
     class Meta:
         model = Order
         fields = ["delivery_address", "promocode", "user", "products"]
@@ -60,3 +70,28 @@ class OrderForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['products'].widget = forms.CheckboxSelectMultiple()
         self.fields['products'].queryset = Product.objects.filter(archived=False)
+
+
+class CSVImportForm(forms.Form):
+    """Форма для загрузки CSV файла."""
+
+    csv_file = forms.FileField()
+
+
+class OrderImportForm(forms.Form):
+    """Форма для импорта заказов из файла."""
+
+    file = forms.FileField(
+        label='Выберите файл для импорта заказов',
+        help_text='Поддерживаемые форматы: CSV, JSON'
+    )
+
+    file_format = forms.ChoiceField(
+        choices=[
+            ('auto', 'Автоопределение'),
+            ('csv', 'CSV'),
+            ('json', 'JSON'),
+        ],
+        initial='auto',
+        label='Формат файла'
+    )

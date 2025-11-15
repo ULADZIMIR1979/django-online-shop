@@ -1,4 +1,5 @@
 from django.db import models
+from django.urls import reverse
 
 
 class Author(models.Model):
@@ -41,6 +42,9 @@ class Article(models.Model):
         Tag,
         related_name='articles'
     )
+
+    def get_absolute_url(self):
+        return reverse("blogapp:article_detail", kwargs={"pk": self.pk})
 
     def __str__(self):
         return self.title

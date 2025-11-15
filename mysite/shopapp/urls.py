@@ -21,6 +21,7 @@ from .views import (
     OrdersExportDownloadView,
     ProductViewSet,
     OrderViewSet,
+    LatestProductsFeed,
 )
 
 app_name = 'shopapp'
@@ -31,20 +32,24 @@ router.register('orders', OrderViewSet)
 
 urlpatterns = [
     path('', ShopIndexView.as_view(), name='index'),
+
     path('api/', include(router.urls)),
+
     path('groups/', GroupsListView.as_view(), name='groups_list'),
+
     path('products/', ProductsListView.as_view(), name='products_list'),
     path('products/export/', ProductsDataExportView.as_view(), name='products_export'),
     path('products/create/', ProductCreateView.as_view(), name='product_create'),
     path('products/<int:pk>/', ProductDetailsView.as_view(), name='product_details'),
     path('products/<int:pk>/update/', ProductUpdateView.as_view(), name='product_update'),
     path('products/<int:pk>/archive/', ProductDeleteView.as_view(), name='product_delete'),
+    path('products/latest/feed/', LatestProductsFeed(), name='product_feed'),
+
     path('orders/', OrdersListView.as_view(), name='order_list'),
     path('orders/create/', OrderCreateView.as_view(), name='create_order'),
     path('orders/<int:pk>/', OrderDetailsView.as_view(), name='order_details'),
     path('orders/<int:pk>/update/', OrderUpdateView.as_view(), name='order_update'),
     path('orders/<int:pk>/archive/', OrderDeleteView.as_view(), name='order_delete'),
-    # Новые пути для экспорта заказов
     path('orders/export/', OrdersExportView.as_view(), name='orders_export'),
     path('orders/export/json/', OrdersExportJSONView.as_view(), name='orders_export_json'),
     path('orders/export/download/', OrdersExportDownloadView.as_view(), name='orders_export_download'),

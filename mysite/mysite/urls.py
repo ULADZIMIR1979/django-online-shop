@@ -7,6 +7,7 @@
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
+from django.contrib.sitemaps.views import sitemap
 from django.urls import path, include
 from django.views.generic import RedirectView
 
@@ -16,6 +17,8 @@ from drf_spectacular.views import (SpectacularAPIView,
                                    SpectacularRedocView,
                                    SpectacularSwaggerView)
 
+from .sitemaps import sitemaps
+
 # Базовые URL паттерны
 urlpatterns = [
     path('', RedirectView.as_view(url='/accounts/login/', permanent=False)),
@@ -24,15 +27,24 @@ urlpatterns = [
     path('api/schema/swagger/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger'),
     path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
     path('api/', include('myapiapp.urls')),
+
+    path('admin/', admin.site.urls),
+    path('accounts/', include('myauth.urls')),
+    path('shop/', include('shopapp.urls')),
+    path('blog/', include('blogapp.urls')),
+
+    path(
+        'sitemap.xml',
+        sitemap,
+        {'sitemaps': sitemaps},
+        name='django.contrib.sitemaps.views.sitemap'
+    )
 ]
 
 # URL паттерны с поддержкой интернационализации
 urlpatterns += i18n_patterns(
     path('admin/doc/', include('django.contrib.admindocs.urls')),
-    path('admin/', admin.site.urls),
-    path('blog/', include('blogapp.urls')),
-    path('accounts/', include('myauth.urls')),
-    path('shop/', include('shopapp.urls')),
+
 )
 
 # Отладочные URL только в режиме DEBUG

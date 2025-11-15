@@ -4,10 +4,13 @@
 Разные view интернет-магазина: по товарам, заказам и т.д.
 """
 
+from csv import DictReader, DictWriter
+import logging
 from timeit import default_timer
 import json
 import os
 from django.conf import settings
+from django.contrib.syndication.views import Feed
 from django.utils.timezone import now
 from django.contrib.auth.models import Group
 from django.http import (
@@ -28,14 +31,22 @@ from django.contrib.auth.mixins import (
 )
 from django.contrib.auth.decorators import user_passes_test
 from django.utils.decorators import method_decorator
+from rest_framework.parsers import MultiPartParser
+from rest_framework.request import Request
+from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
+from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import extend_schema, OpenApiResponse
 
+from .common import save_csv_products
 from .forms import ProductForm, OrderForm, GroupForm
 from .models import Product, Order, ProductImage
 from .serializers import ProductSerializer, OrderSerializer
+
+
+log = logging.getLogger(__name__)
 
 
 @extend_schema(description="Product views CRUD")
@@ -77,9 +88,51 @@ class ProductViewSet(ModelViewSet):
             ),
         }
     )
+
     def retrieve(self, *args, **kwargs):
-        """Retrieve a product instance."""
+        """Получить экземпляр товара."""
+
         return super().retrieve(*args, **kwargs)
+
+    @action(detail=False, methods=['get'])
+    def download_csv(self, request: Request):
+        """Загрузка товаров в формате CSV."""
+
+        response = HttpResponse(content_type='text/csv')
+        filename = 'products-export.csv'
+        response['Content-Disposition'] = f'attachment; filename={filename}'
+        queryset = self.filter_queryset(self.get_queryset())
+        fields = [
+            "name",
+            "description",
+            "price",
+            "discount",
+        ]
+        queryset = queryset.only(*fields)
+        writer = DictWriter(response, fieldnames=fields)
+        writer.writeheader()
+
+        for product in queryset:
+            writer.writerow({
+                field: getattr(product, field)
+                for field in fields
+            })
+        return response
+
+    @action(
+            detail=False,
+            methods=['post'],
+            parser_classes=[MultiPartParser],
+    )
+    def upload_csv(self, request: Request):
+        """Загрузка товаров в формате CSV."""
+
+        products = save_csv_products(
+            request.FILES['file'].file,
+            encoding=request.encoding,
+        )
+        serializer = self.get_serializer(products, many=True)
+        return Response(serializer.data)
 
 
 @extend_schema(description="Order views CRUD")
@@ -123,15 +176,17 @@ class OrderViewSet(ModelViewSet):
         }
     )
     def retrieve(self, *args, **kwargs):
-        """Retrieve an order instance."""
+        """Получить экземпляр заказа."""
+
         return super().retrieve(*args, **kwargs)
 
 
 class ShopIndexView(View):
-    """View for shop index page."""
+    """Представление для главной страницы магазина."""
 
     def get(self, request: HttpRequest) -> HttpResponse:
-        """Handle GET request for shop index."""
+        """Обработка GET-запроса."""
+
         products = [
             {"name": "Laptop", "price": 1999},
             {"name": "Desktop", "price": 2999},
@@ -141,14 +196,17 @@ class ShopIndexView(View):
             "time_running": default_timer(),
             "products": products,
         }
+        log.debug("Products for shop index: %s", products)
+        log.info("Rendering shop index")
         return render(request, 'shopapp/shop-index.html', context=context)
 
 
 class GroupsListView(View):
-    """View for groups list page."""
+    """Представление для списка групп."""
 
     def get(self, request: HttpRequest) -> HttpResponse:
-        """Handle GET request for groups list."""
+        """Обработка GET-запроса."""
+
         context = {
             "form": GroupForm(),
             "groups": Group.objects.prefetch_related('permissions').all(),
@@ -156,7 +214,8 @@ class GroupsListView(View):
         return render(request, 'shopapp/groups-list.html', context=context)
 
     def post(self, request: HttpRequest):
-        """Handle POST request for groups list."""
+        """Обработка POST-запроса."""
+
         form = GroupForm(request.POST)
         if form.is_valid():
             form.save()
@@ -164,7 +223,7 @@ class GroupsListView(View):
 
 
 class ProductDetailsView(DetailView):
-    """View for product details page."""
+    """Представление для деталей товара."""
 
     template_name = 'shopapp/product-details.html'
     queryset = Product.objects.prefetch_related("images")
@@ -172,7 +231,7 @@ class ProductDetailsView(DetailView):
 
 
 class ProductsListView(ListView):
-    """View for products list page."""
+    """Представление для списка товаров."""
 
     template_name = 'shopapp/products-list.html'
     context_object_name = 'products'
@@ -180,7 +239,7 @@ class ProductsListView(ListView):
 
 
 class ProductCreateView(PermissionRequiredMixin, CreateView):
-    """View for creating a product."""
+    """Представление для создания товара."""
 
     permission_required = 'shopapp.add_product'
     model = Product
@@ -188,20 +247,21 @@ class ProductCreateView(PermissionRequiredMixin, CreateView):
     success_url = reverse_lazy('shopapp:products_list')
 
     def form_valid(self, form):
-        """Validate form and set created_by user."""
+        """Проверить форму и обработать изображения товара."""
+
         form.instance.created_by = self.request.user
         return super().form_valid(form)
 
 
 class ProductUpdateView(UserPassesTestMixin, UpdateView):
-    """View for updating a product."""
+    """Представление для обновления товара."""
 
     model = Product
     template_name_suffix = '_update_form'
     form_class = ProductForm
 
     def test_func(self):
-        """Test if user has permission to update product."""
+        """Тест доступа к обновлению товара."""
         product = self.get_object()
         if self.request.user.is_superuser:
             return True
@@ -211,14 +271,15 @@ class ProductUpdateView(UserPassesTestMixin, UpdateView):
         )
 
     def get_success_url(self):
-        """Get success URL after update."""
+        """Получить URL для перенаправления после успешного обновления."""
+
         return reverse(
             'shopapp:product_details',
             kwargs={"pk": self.object.pk},
         )
 
     def form_valid(self, form):
-        """Validate form and handle product images."""
+        """Обработать изображения товара."""
         response = super().form_valid(form)
         for image in form.files.getlist('images'):
             ProductImage.objects.create(
@@ -229,13 +290,14 @@ class ProductUpdateView(UserPassesTestMixin, UpdateView):
 
 
 class ProductDeleteView(DeleteView):
-    """View for deleting a product."""
+    """Представление для удаления товара."""
 
     model = Product
     success_url = reverse_lazy('shopapp:products_list')
 
     def form_valid(self, form):
-        """Archive product instead of deleting."""
+        """Обработать удаление товара."""
+
         success_url = self.get_success_url()
         self.object.archived = True
         self.object.save()
@@ -243,7 +305,7 @@ class ProductDeleteView(DeleteView):
 
 
 class OrdersListView(LoginRequiredMixin, ListView):
-    """View for orders list page."""
+    """Просмотр страницы списка заказов."""
 
     template_name = 'shopapp/order-list.html'
     model = Order
@@ -256,14 +318,15 @@ class OrdersListView(LoginRequiredMixin, ListView):
 
 
 class OrderDetailsView(LoginRequiredMixin, DetailView):
-    """View for order details page."""
+    """Просмотр страницы сведений о заказе."""
 
     template_name = 'shopapp/order_detail.html'
     model = Order
     context_object_name = 'order'
 
     def get_object(self, queryset=None):
-        """Get order object with access control."""
+        """Получить объект заказа."""
+
         order = super().get_object(queryset)
         self.access_denied = not (
             self.request.user.is_superuser or order.user == self.request.user
@@ -273,14 +336,15 @@ class OrderDetailsView(LoginRequiredMixin, DetailView):
         return order
 
     def get_context_data(self, **kwargs):
-        """Add access_denied flag to context."""
+        """Получить контекст данных."""
+
         context = super().get_context_data(**kwargs)
         context['access_denied'] = getattr(self, 'access_denied', False)
         return context
 
 
 class OrderCreateView(CreateView):
-    """View for creating an order."""
+    """Просмотр для создания заказа."""
 
     model = Order
     form_class = OrderForm
@@ -289,14 +353,15 @@ class OrderCreateView(CreateView):
 
 
 class OrderUpdateView(UpdateView):
-    """View for updating an order."""
+    """Просмотр для обновления заказа."""
 
     model = Order
     form_class = OrderForm
     template_name_suffix = '_update_form'
 
     def get_success_url(self):
-        """Get success URL after update."""
+        """Получить URL для перенаправления после обновления."""
+
         return reverse(
             'shopapp:order_details',
             kwargs={"pk": self.object.pk},
@@ -304,13 +369,14 @@ class OrderUpdateView(UpdateView):
 
 
 class OrderDeleteView(DeleteView):
-    """View for deleting an order."""
+    """Просмотр для удаления заказа."""
 
     model = Order
     success_url = reverse_lazy('shopapp:order_list')
 
     def form_valid(self, form):
-        """Archive order instead of deleting."""
+        """Обработать удаление заказа."""
+
         success_url = self.get_success_url()
         self.object.archived = True
         self.object.save()
@@ -318,10 +384,17 @@ class OrderDeleteView(DeleteView):
 
 
 class ProductsDataExportView(View):
-    """View for exporting products data as JSON."""
+    """Главная страница экспорта товаров с кнопками."""
+
+    @method_decorator(user_passes_test(lambda u: u.is_staff))
+    def dispatch(self, *args, **kwargs):
+        """Проверить, является ли пользователь сотрудником перед обработкой запроса."""
+
+        return super().dispatch(*args, **kwargs)
 
     def get(self, request: HttpRequest) -> JsonResponse:
-        """Export products data as JSON."""
+        """Обработать GET-запрос."""
+
         products = Product.objects.order_by("pk").all()
         products_data = [
             {
@@ -332,6 +405,9 @@ class ProductsDataExportView(View):
             }
             for product in products
         ]
+        elem = products_data[0]
+        name = elem["name"]
+        print('name:', name)
         return JsonResponse({"products": products_data})
 
 
@@ -340,11 +416,13 @@ class OrdersExportView(View):
 
     @method_decorator(user_passes_test(lambda u: u.is_staff))
     def dispatch(self, *args, **kwargs):
-        """Check if user is staff before dispatching."""
+        """Проверить, является ли пользователь сотрудником перед обработкой запроса."""
+
         return super().dispatch(*args, **kwargs)
 
     def get(self, request: HttpRequest) -> HttpResponse:
-        """Handle GET request for orders export page."""
+        """Обработать GET-запрос."""
+
         orders_count = Order.objects.count()
         context = {
             'orders_count': orders_count,
@@ -357,11 +435,13 @@ class OrdersExportJSONView(View):
 
     @method_decorator(user_passes_test(lambda u: u.is_staff))
     def dispatch(self, *args, **kwargs):
-        """Check if user is staff before dispatching."""
+        """Проверить, является ли пользователь сотрудником перед обработкой запроса."""
+
         return super().dispatch(*args, **kwargs)
 
     def get(self, request: HttpRequest) -> JsonResponse:
-        """Export orders data as JSON in browser."""
+        """Обработать GET-запрос."""
+
         orders = Order.objects.select_related(
             'user'
         ).prefetch_related('products').all()
@@ -395,11 +475,13 @@ class OrdersExportDownloadView(View):
 
     @method_decorator(user_passes_test(lambda u: u.is_staff))
     def dispatch(self, *args, **kwargs):
-        """Check if user is staff before dispatching."""
+        """Проверить, является ли пользователь сотрудником перед обработкой запроса."""
+
         return super().dispatch(*args, **kwargs)
 
     def get(self, request: HttpRequest) -> HttpResponse:
-        """Download orders data as JSON file."""
+        """Скачать данные заказов в виде JSON файла."""
+
         orders = Order.objects.select_related(
             'user'
         ).prefetch_related('products').all()
@@ -441,3 +523,23 @@ class OrdersExportDownloadView(View):
                 "status": "error",
                 "message": f"Ошибка при сохранении файла: {str(e)}"
             }, status=500)
+
+
+class LatestProductsFeed(Feed):
+    """RSS feed для последних товаров."""
+
+    title = "Latest products"
+    description = "New products in our shop"
+    link = reverse_lazy('shopapp:products_list')
+
+    def items(self):
+        return Product.objects.filter(archived=False).order_by('-created_at')[:5]
+
+    def item_title(self, item):
+        return item.name
+
+    def item_description(self, item):
+        return item.description
+
+    def item_link(self, item):
+        return reverse('shopapp:product_details', kwargs={'pk': item.pk})

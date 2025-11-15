@@ -7,10 +7,13 @@
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django.urls import reverse
 
 
 def product_preview_directory_path(instance: 'Product', filename: str) -> str:
-    """Generate directory path for product preview image."""
+    """Генерирует путь к директории для изображения
+    предварительного просмотра товара."""
+
     return "products/product_{pk}/preview/{filename}".format(
         pk=instance.pk,
         filename=filename,
@@ -27,7 +30,7 @@ class Product(models.Model):
     """
 
     class Meta:
-        """Meta options for Product model."""
+        """Мета-опции для модели Product."""
 
         ordering = ['name']
         verbose_name = _('Product')
@@ -37,8 +40,8 @@ class Product(models.Model):
             ("can_change_product", "Can change product"),
         ]
 
-    name = models.CharField(max_length=100)
-    description = models.TextField(null=False, blank=True)
+    name = models.CharField(max_length=100, db_index=True)
+    description = models.TextField(null=False, blank=True, db_index=True)
     price = models.DecimalField(default=0, max_digits=8, decimal_places=2)
     discount = models.PositiveSmallIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -55,20 +58,27 @@ class Product(models.Model):
     )
 
     def __str__(self) -> str:
-        """Return string representation of Product."""
+        """Возвращает строковое представление модели Product."""
+
         return f"Product(pk={self.pk}, name={self.name!r})"
 
 
 def product_images_directory_path(instance: 'ProductImage', filename: str) -> str:
-    """Generate directory path for product images."""
+    """Генерирует путь к директории для изображения товара."""
+
     return "products/product_{pk}/images/{filename}".format(
         pk=instance.product.pk,
         filename=filename,
     )
 
+def get_absolute_url(self):
+    """Возвращает URL-адрес страницы с деталями товара."""
+
+    return reverse('shopapp:product_details', kwargs={'pk': self.pk})
+
 
 class ProductImage(models.Model):
-    """Model for product images."""
+    """Модель ProductImage представляет изображение товара."""
 
     product = models.ForeignKey(
         Product, on_delete=models.CASCADE, related_name='images'
@@ -78,10 +88,10 @@ class ProductImage(models.Model):
 
 
 class Order(models.Model):
-    """Model for customer orders."""
+    """Модель Order представляет заказ пользователя."""
 
     class Meta:
-        """Meta options for Order model."""
+        """Мета-опции для модели Order."""
 
         ordering = ['-created_at']
         verbose_name = _('Order')
@@ -96,12 +106,14 @@ class Order(models.Model):
     receipt = models.FileField(null=True, upload_to='orders/receipts/')
 
     def __str__(self) -> str:
-        """Return string representation of Order."""
+        """Возвращает строковое представление модели Order."""
+
         if self.pk:
             return f"Order(pk={self.pk}, user={self.user.username!r})"
         else:
             return f"Order(user={self.user.username!r})"
 
     def get_total_price(self):
-        """Calculate total price of all products in the order."""
+        """Возвращает общую стоимость заказа."""
+
         return sum(product.price for product in self.products.all())

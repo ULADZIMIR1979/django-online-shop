@@ -1,154 +1,57 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ author.name }} - Автор</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 20px;
-            line-height: 1.7;
-            color: #333;
-        }
-        .author-header {
-            border-bottom: 2px solid #007bff;
-            padding-bottom: 25px;
-            margin-bottom: 30px;
-            text-align: center;
-        }
-        .author-name {
-            color: #2c3e50;
-            margin-bottom: 15px;
-            font-size: 2.5em;
-        }
-        .bio {
-            margin: 30px 0;
-            padding: 25px;
-            background: #f8f9fa;
-            border-radius: 8px;
-            font-size: 1.1em;
-            line-height: 1.8;
-        }
-        .articles-section {
-            margin: 40px 0;
-        }
-        .section-title {
-            color: #2c3e50;
-            border-bottom: 2px solid #007bff;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-        }
-        .article-card {
-            border: 1px solid #e9ecef;
-            padding: 20px;
-            margin-bottom: 15px;
-            border-radius: 5px;
-            transition: box-shadow 0.3s ease;
-        }
-        .article-card:hover {
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        .article-title {
-            color: #007bff;
-            text-decoration: none;
-            font-size: 1.3em;
-            margin-bottom: 10px;
-            display: block;
-        }
-        .article-title:hover {
-            color: #0056b3;
-            text-decoration: underline;
-        }
-        .article-meta {
-            color: #666;
-            font-size: 0.9em;
-            margin-bottom: 10px;
-        }
-        .tags {
-            margin-top: 10px;
-        }
-        .tag {
-            display: inline-block;
-            background: #e9ecef;
-            padding: 3px 8px;
-            border-radius: 3px;
-            margin-right: 5px;
-            font-size: 0.8em;
-            color: #495057;
-        }
-        .back-link {
-            display: inline-block;
-            margin-top: 30px;
-            padding: 12px 25px;
-            background: #007bff;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            font-weight: 500;
-            transition: background-color 0.3s ease;
-        }
-        .back-link:hover {
-            background: #0056b3;
-            text-decoration: none;
-            color: white;
-        }
-        .stats {
-            background: #e9ecef;
-            padding: 15px;
-            border-radius: 5px;
-            margin: 20px 0;
-            text-align: center;
-        }
-    </style>
-</head>
-<body>
-    <div class="author-header">
-        <h1 class="author-name">{{ author.name }}</h1>
+{% extends 'blogapp/base.html' %}
 
-        <div class="stats">
-            <strong>📊 Статистика:</strong>
-            Написал {{ articles.count }} статей
-        </div>
-    </div>
+{% block title %}{{ author.name }} - Автор - Блог{% endblock %}
 
-    <div class="bio">
-        <h2>📖 Биография</h2>
-        {{ author.bio|linebreaks }}
-    </div>
+{% block content %}
+<div class="author-header" style="border-bottom: 2px solid #007bff; padding-bottom: 25px; margin-bottom: 30px; text-align: center;">
+    <h1 style="color: #2c3e50; margin-bottom: 15px; font-size: 2.5em;">{{ author.name }}</h1>
 
-    <div class="articles-section">
-        <h2 class="section-title">📝 Статьи автора</h2>
-
-        {% if articles %}
-            {% for article in articles %}
-            <div class="article-card">
-                <a href="{% url 'article_detail' article.pk %}" class="article-title">
-                    {{ article.title }}
-                </a>
-
-                <div class="article-meta">
-                    <strong>📅 Дата:</strong> {{ article.pub_date|date:"d.m.Y H:i" }} |
-                    <strong>📂 Категория:</strong> {{ article.category.name }}
-                </div>
-
-                <div class="tags">
-                    <strong>🏷️ Теги:</strong>
-                    {% for tag in article.tags.all %}
-                        <span class="tag">{{ tag.name }}</span>
-                    {% empty %}
-                        <span>Нет тегов</span>
-                    {% endfor %}
-                </div>
-            </div>
-            {% endfor %}
-        {% else %}
-            <p>У этого автора пока нет статей.</p>
+    <div class="stats" style="background: #e9ecef; padding: 15px; border-radius: 5px; margin: 20px 0; text-align: center;">
+        <strong>📊 Статистика:</strong>
+        Написано {{ articles.count }}
+        {% if articles.count == 1 %}статья
+        {% elif articles.count >= 2 and articles.count <= 4 %}статьи
+        {% else %}статей
         {% endif %}
     </div>
+</div>
 
-    <a href="{% url 'article_list' %}" class="back-link">← Назад к списку статей</a>
-</body>
-</html>
+<div class="bio" style="margin: 30px 0; padding: 25px; background: #f8f9fa; border-radius: 8px; font-size: 1.1em; line-height: 1.8;">
+    <h2>📖 Биография</h2>
+    {{ author.bio|linebreaks }}
+</div>
+
+<div class="articles-section" style="margin: 40px 0;">
+    <h2 style="color: #2c3e50; border-bottom: 2px solid #007bff; padding-bottom: 10px; margin-bottom: 20px;">📝 Статьи автора</h2>
+
+    {% if articles %}
+        {% for article in articles %}
+        <div class="article-card" style="border: 1px solid #e9ecef; padding: 20px; margin-bottom: 15px; border-radius: 5px; transition: box-shadow 0.3s ease;">
+            <a href="{% url 'blogapp:article_detail' article.pk %}" class="article-title" style="font-size: 1.3em; margin-bottom: 10px; display: block;">
+                {{ article.title }}
+            </a>
+
+            <div class="article-meta" style="color: #666; font-size: 0.9em; margin-bottom: 10px;">
+                <strong>📅 Дата:</strong> {{ article.pub_date|date:"d.m.Y H:i" }} |
+                <strong>📂 Категория:</strong> {{ article.category.name }}
+            </div>
+
+            <div class="tags">
+                <strong>🏷️ Теги:</strong>
+                {% for tag in article.tags.all %}
+                    <span class="tag">{{ tag.name }}</span>
+                {% empty %}
+                    <span>Нет тегов</span>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <p>😔 У этого автора пока нет статей.</p>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block back_link %}
+<a href="{% url 'blogapp:article_list' %}" class="back-link">← Назад к списку статей</a>
+{% endblock %}

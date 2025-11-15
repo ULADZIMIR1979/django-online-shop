@@ -1,4 +1,7 @@
+from django.contrib.syndication.views import Feed
 from django.views.generic import ListView, DetailView
+from django.urls import reverse, reverse_lazy
+
 from .models import Article, Author
 
 
@@ -48,3 +51,24 @@ class AuthorDetailView(DetailView):
             author=self.object
         ).select_related('category').prefetch_related('tags').defer('content')
         return context
+
+
+class LatestArticlesFeed(Feed):
+    title = "Последние статьи блога"
+    link = "/blog/articles/"
+    description = "Новые статьи из нашего блога"
+
+    def items(self):
+        return Article.objects.order_by('-pub_date')[:10]
+
+    def item_title(self, item):
+        return item.title
+
+    def item_description(self, item):
+        return item.content[:200] + "..." if len(item.content) > 200 else item.content
+
+    def item_link(self, item: Article):
+        return reverse('blogapp:article_detail', args=[item.pk])
+
+    def item_pubdate(self, item):
+        return item.pub_date
