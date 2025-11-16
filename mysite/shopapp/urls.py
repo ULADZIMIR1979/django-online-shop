@@ -21,7 +21,7 @@ from .views import (
     OrdersExportDownloadView,
     ProductViewSet,
     OrderViewSet,
-    LatestProductsFeed,
+    LatestProductsFeed, UserOrdersExportView, UserOrdersListView,
 )
 
 app_name = 'shopapp'
@@ -36,6 +36,9 @@ urlpatterns = [
     path('api/', include(router.urls)),
 
     path('groups/', GroupsListView.as_view(), name='groups_list'),
+
+path('users/<int:user_id>/orders/', UserOrdersListView.as_view(), name='user_orders'),
+    path('users/<int:user_id>/orders/export/', UserOrdersExportView.as_view(), name='user_orders_export'),
 
     path('products/', ProductsListView.as_view(), name='products_list'),
     path('products/export/', ProductsDataExportView.as_view(), name='products_export'),

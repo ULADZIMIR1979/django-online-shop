@@ -1,0 +1,93 @@
+{% extends "shopapp/base.html" %}
+{% load cache %}
+{% load i18n %}
+
+{% block title %}
+    {% blocktranslate with username=owner.username %}Orders for {{ username }}{% endblocktranslate %}
+{% endblock %}
+
+{% block body %}
+    <div class="container mt-4">
+        <h1 class="text-primary">
+            {% if owner.first_name or owner.last_name %}
+                {% blocktranslate with first_name=owner.first_name last_name=owner.last_name %}
+                    Orders for {{ first_name }} {{ last_name }}
+                {% endblocktranslate %}
+            {% else %}
+                {% blocktranslate with username=owner.username %}Orders for {{ username }}{% endblocktranslate %}
+            {% endif %}
+        </h1>
+
+        {% if orders %}
+            <div class="alert alert-info">
+                {% blocktranslate with username=owner.username count order_count=orders|length %}
+                    User {{ username }} has completed the following order:
+                {% plural %}
+                    User {{ username }} has completed the following orders ({{ order_count }}):
+                {% endblocktranslate %}
+            </div>
+
+            {# Кешируем только часть с заказами #}
+            {% cache 300 user_orders_list owner.pk %}
+            <div class="row">
+                {% for order in orders %}
+                    <div class="col-md-6 mb-4">
+                        <div class="card shadow-sm">
+                            <div class="card-header bg-light">
+                                <h5 class="card-title mb-0">
+                                    <i class="bi bi-receipt"></i>
+                                    {% blocktranslate with order_number=order.pk %}Order #{{ order_number }}{% endblocktranslate %}
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <p><strong>{% translate 'Delivery Address' %}:</strong> {{ order.delivery_address }}</p>
+                                {% if order.promocode %}
+                                    <p><strong>{% translate 'Promocode' %}:</strong> <code>{{ order.promocode }}</code></p>
+                                {% endif %}
+                                <p><strong>{% translate 'Date' %}:</strong> {{ order.created_at|date:"Y-m-d H:i" }}</p>
+                                
+                                <h6>{% translate 'Products' %}:</h6>
+                                <ul class="list-group list-group-flush">
+                                    {% for product in order.products.all %}
+                                        <li class="list-group-item d-flex justify-content-between">
+                                            <span>{{ product.name }}</span>
+                                            <span class="badge bg-primary">${{ product.price }}</span>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            {% endcache %}
+
+        {% else %}
+            <div class="alert alert-warning text-center py-5">
+                <i class="bi bi-cart-x display-1 text-muted"></i>
+                <h3 class="text-muted mt-3">
+                    {% if owner.first_name or owner.last_name %}
+                        {% blocktranslate with first_name=owner.first_name last_name=owner.last_name %}
+                            User {{ first_name }} {{ last_name }} has no orders yet.
+                        {% endblocktranslate %}
+                    {% else %}
+                        {% blocktranslate with username=owner.username %}
+                            User {{ username }} has no orders yet.
+                        {% endblocktranslate %}
+                    {% endif %}
+                </h3>
+            </div>
+        {% endif %}
+
+        <div class="mt-4">
+            <a href="{% url 'shopapp:order_list' %}" class="btn btn-primary">
+                <i class="bi bi-arrow-left"></i>
+                {% translate 'Back to All Orders' %}
+            </a>
+            <a href="{% url 'shopapp:user_orders_export' user_id=owner.pk %}" class="btn btn-success">
+                <i class="bi bi-download"></i>
+                {% translate 'Export Orders' %}
+            </a>
+        </div>
+    </div>
+{% endblock %}

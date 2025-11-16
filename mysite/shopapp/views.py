@@ -18,8 +18,12 @@ from django.http import (
     HttpResponseRedirect, JsonResponse
 )
 from django.shortcuts import render, redirect, reverse
+from django.shortcuts import get_object_or_404
+from django.contrib.auth import get_user_model
 from django.urls import reverse_lazy
 from django.views import View
+from django.views.decorators.cache import cache_page
+from django.core.cache import cache
 from django.views.generic import (
     ListView, DetailView,
     CreateView, UpdateView, DeleteView
@@ -77,6 +81,11 @@ class ProductViewSet(ModelViewSet):
         "price",
         "discount",
     ]
+
+    @method_decorator(cache_page(60 * 2))
+    def list(self, *args, **kwargs):
+        print('hello products list')
+        return super().list(*args, **kwargs)
 
     @extend_schema(
         summary="Get one product by ID",
@@ -184,6 +193,7 @@ class OrderViewSet(ModelViewSet):
 class ShopIndexView(View):
     """Представление для главной страницы магазина."""
 
+    # @method_decorator(cache_page(60 * 2))
     def get(self, request: HttpRequest) -> HttpResponse:
         """Обработка GET-запроса."""
 
@@ -196,8 +206,11 @@ class ShopIndexView(View):
             "time_running": default_timer(),
             "products": products,
         }
+        print('shop index context', context)
+
         log.debug("Products for shop index: %s", products)
         log.info("Rendering shop index")
+
         return render(request, 'shopapp/shop-index.html', context=context)
 
 
@@ -395,19 +408,23 @@ class ProductsDataExportView(View):
     def get(self, request: HttpRequest) -> JsonResponse:
         """Обработать GET-запрос."""
 
-        products = Product.objects.order_by("pk").all()
-        products_data = [
-            {
-                "pk": product.pk,
-                "name": product.name,
-                "price": product.price,
-                "archived": product.archived,
-            }
-            for product in products
-        ]
-        elem = products_data[0]
-        name = elem["name"]
-        print('name:', name)
+        cache_key = "products_data_export"
+        products_data = cache.get(cache_key)
+        if products_data is None:
+            products = Product.objects.order_by("pk").all()
+            products_data = [
+                {
+                    "pk": product.pk,
+                    "name": product.name,
+                    "price": product.price,
+                    "archived": product.archived,
+                }
+                for product in products
+            ]
+            elem = products_data[0]
+            name = elem["name"]
+            print('name:', name)
+            cache.set(cache_key, products_data, 300)
         return JsonResponse({"products": products_data})
 
 
@@ -543,3 +560,75 @@ class LatestProductsFeed(Feed):
 
     def item_link(self, item):
         return reverse('shopapp:product_details', kwargs={'pk': item.pk})
+
+
+class UserOrdersListView(LoginRequiredMixin, ListView):
+    """Список заказов конкретного пользователя."""
+
+    template_name = 'shopapp/user_orders_list.html'
+    context_object_name = 'orders'
+
+    def get_queryset(self):
+        user_id = self.kwargs['user_id']
+        self.owner = get_object_or_404(get_user_model(), pk=user_id)
+        return Order.objects.filter(
+            user=self.owner,
+            archived=False
+        ).select_related('user').prefetch_related('products').order_by('-created_at')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['owner'] = self.owner
+        return context
+
+
+class UserOrdersExportView(LoginRequiredMixin, View):
+    """Экспорт заказов пользователя в JSON."""
+
+    def get(self, request: HttpRequest, user_id: int) -> JsonResponse:
+        # Получаем пользователя
+        owner = get_object_or_404(get_user_model(), pk=user_id)
+
+        # Генерируем ключ для кеша
+        cache_key = f"user_orders_export_{user_id}"
+
+        # Пытаемся получить данные из кеша
+        orders_data = cache.get(cache_key)
+
+        if orders_data is None:
+            # Если данных нет в кеше, загружаем из базы
+            orders = Order.objects.filter(
+                user=owner
+            ).select_related('user').prefetch_related('products').order_by('pk')
+
+            # Сериализуем данные
+            orders_data = []
+            for order in orders:
+                orders_data.append({
+                    "id": order.pk,
+                    "delivery_address": order.delivery_address,
+                    "promocode": order.promocode,
+                    "created_at": order.created_at.isoformat(),
+                    "products": [
+                        {
+                            "id": product.pk,
+                            "name": product.name,
+                            "price": str(product.price),
+                        }
+                        for product in order.products.all()
+                    ],
+                    "archived": order.archived,
+                })
+
+            # Сохраняем в кеш на 5 минут
+            cache.set(cache_key, orders_data, 300)
+
+        return JsonResponse({
+            "user": {
+                "id": owner.pk,
+                "username": owner.username,
+                "first_name": owner.first_name,
+                "last_name": owner.last_name,
+            },
+            "orders": orders_data
+        })

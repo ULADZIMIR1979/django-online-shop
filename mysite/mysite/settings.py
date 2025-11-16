@@ -7,6 +7,7 @@
 import os
 from pathlib import Path
 
+from django.conf.global_settings import CACHE_MIDDLEWARE_SECONDS
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as gettext
 
@@ -74,6 +75,7 @@ INSTALLED_APPS = [
 
 # Промежуточное ПО
 MIDDLEWARE = [
+    # 'django.middleware.cache.UpdateCacheMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -86,7 +88,8 @@ MIDDLEWARE = [
     'requestdataapp.middlewares.CountRequestMiddleware',
     'requestdataapp.middlewares.ThrottlingMiddleware',
     'django.contrib.admindocs.middleware.XViewMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware',  # Middleware для Debug Toolbar
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
+    # 'django.middleware.cache.FetchFromCacheMiddleware',
 ]
 
 # Конфигурация URL
@@ -123,6 +126,16 @@ DATABASES = {
         'ATOMIC_REQUESTS': False,
     }
 }
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+        # 'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        # 'LOCATION': '/var/tmp/django_cache',
+    },
+}
+
+CACHE_MIDDLEWARE_SECONDS = 200
 
 # Валидаторы паролей
 AUTH_PASSWORD_VALIDATORS = [

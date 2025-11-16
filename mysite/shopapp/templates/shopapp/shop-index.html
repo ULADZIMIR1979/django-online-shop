@@ -1,4 +1,5 @@
 {% extends "shopapp/base.html" %}
+{% load cache %}
 {% load static %}
 {% load i18n %}
 
@@ -73,9 +74,11 @@
         </div>
     {% endif %}
 
-    <div>
-        <h3>📝 {% translate 'Shop Description' %}:</h3>
-        <p>{% translate 'We offer a wide range of electronics at competitive prices. Each product undergoes thorough quality control.' %}</p>
-    </div>
+    {% cache 100 lorem %}
+        <div>
+            <h3>📝 {% translate 'Shop Description' %}:</h3>
+            <p>{% translate 'We offer a wide range of electronics at competitive prices. Each product undergoes thorough quality control.' %}</p>
+        </div>
+    {% endcache %}
 
 {% endblock %}
