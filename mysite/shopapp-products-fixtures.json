@@ -1,0 +1,100 @@
+[
+  {
+    "model": "shopapp.product",
+    "pk": 1,
+    "fields": {
+      "name": "Desktop",
+      "description": "Cool desktop",
+      "price": "20000.00",
+      "discount": 10,
+      "created_at": "2025-10-14T08:42:56.576Z",
+      "archived": false,
+      "preview": "products/product_1/preview/275dd3efcbc1eb6da82f0599ec8d9ab2.jpg",
+      "created_by": null
+    }
+  },
+  {
+    "model": "shopapp.product",
+    "pk": 2,
+    "fields": {
+      "name": "Phone",
+      "description": "Very nice!",
+      "price": "15000.00",
+      "discount": 0,
+      "created_at": "2025-10-14T08:43:59.880Z",
+      "archived": false,
+      "preview": "",
+      "created_by": null
+    }
+  },
+  {
+    "model": "shopapp.product",
+    "pk": 3,
+    "fields": {
+      "name": "Phone2",
+      "description": "",
+      "price": "18000.00",
+      "discount": 5,
+      "created_at": "2025-10-14T08:44:25.243Z",
+      "archived": false,
+      "preview": "",
+      "created_by": null
+    }
+  },
+  {
+    "model": "shopapp.product",
+    "pk": 9,
+    "fields": {
+      "name": "Headphones",
+      "description": "New headphones",
+      "price": "199.00",
+      "discount": 10,
+      "created_at": "2025-11-07T09:27:18.394Z",
+      "archived": false,
+      "preview": "",
+      "created_by": null
+    }
+  },
+  {
+    "model": "shopapp.product",
+    "pk": 10,
+    "fields": {
+      "name": "Smartphone 5",
+      "description": "",
+      "price": "199.00",
+      "discount": 10,
+      "created_at": "2025-11-09T07:07:23.612Z",
+      "archived": false,
+      "preview": "",
+      "created_by": null
+    }
+  },
+  {
+    "model": "shopapp.product",
+    "pk": 11,
+    "fields": {
+      "name": "Smartphone 6",
+      "description": "",
+      "price": "299.00",
+      "discount": 10,
+      "created_at": "2025-11-09T07:07:23.612Z",
+      "archived": false,
+      "preview": "",
+      "created_by": null
+    }
+  },
+  {
+    "model": "shopapp.product",
+    "pk": 12,
+    "fields": {
+      "name": "Smartphone 7",
+      "description": "",
+      "price": "399.00",
+      "discount": 10,
+      "created_at": "2025-11-09T07:07:23.612Z",
+      "archived": false,
+      "preview": "",
+      "created_by": null
+    }
+  }
+]

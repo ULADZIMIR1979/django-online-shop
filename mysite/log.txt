@@ -1,0 +1,9 @@
+2025-11-09 18:41:14,910 [INFO] shopapp.views: Rendering shop index
+2025-11-09 18:41:15,410 [INFO] shopapp.views: Rendering shop index
+2025-11-09 18:41:18,279 [INFO] shopapp.views: Rendering shop index
+2025-11-09 18:42:34,108 [INFO] django.utils.autoreload: /home/vladimirlesh/PycharmProjects/python_django/mysite/mysite/settings.py changed, reloading.
+2025-11-09 18:42:34,686 [INFO] django.utils.autoreload: Watching for file changes with StatReloader
+2025-11-10 18:49:13,936 [INFO] django.utils.autoreload: Watching for file changes with StatReloader
+2025-11-10 18:49:37,016 [WARNING] django.request: Not Found: /favicon.ico
+2025-11-10 18:50:16,510 [INFO] shopapp.views: Rendering shop index
+2025-11-10 18:56:35,718 [INFO] shopapp.views: Rendering shop index

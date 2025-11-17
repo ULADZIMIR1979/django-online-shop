@@ -5,7 +5,9 @@
 """
 
 import os
+from os import getenv
 from pathlib import Path
+import logging.config
 
 from django.conf.global_settings import CACHE_MIDDLEWARE_SECONDS
 from django.urls import reverse_lazy
@@ -22,13 +24,23 @@ sentry_sdk.init(
 
 # Базовый путь проекта
 BASE_DIR = Path(__file__).resolve().parent.parent
+DATABASE_DIR = BASE_DIR / 'database'
+DATABASE_DIR.mkdir(exist_ok=True)
 
 # Настройки безопасности
-SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-shpni&6)!ss''(b=-^bk2o4-t-sm$5c5dpah__xm)93@uuat%uz*')
-DEBUG = os.environ.get('DEBUG', 'True').lower() == 'true'
+SECRET_KEY = getenv(
+    'DJANGO_SECRET_KEY',
+    'django-insecure-shpni&6)!ss''(b=-^bk2o4-t-sm$5c5dpah__xm)93@uuat%uz*'
+)
+
+DEBUG = getenv('DJANGO_DEBUG', 'False') == 'True'
 
 # Разрешенные хосты для Docker
-ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', '0.0.0.0,127.0.0.1,localhost').split(',')
+ALLOWED_HOSTS = [
+    '0.0.0.0',
+    '127.0.0.1',
+    'localhost',
+] + getenv('DJANGO_ALLOWED_HOSTS', '').split(',')
 
 # Внутренние IP-адреса для Django Debug Toolbar
 INTERNAL_IPS = [
@@ -118,7 +130,7 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': DATABASE_DIR / 'db.sqlite3',
         'OPTIONS': {
             'timeout': 30,
             'check_same_thread': False,
@@ -172,50 +184,39 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'uploads'
 
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Настройки аутентификации
 LOGIN_REDIRECT_URL = reverse_lazy("myauth:about-me")
 LOGIN_URL = reverse_lazy("myauth:login")
 
+LOGLEVEL = getenv("DJANGO_LOGLEVEL", "INFO")
+
 # Настройки логирования для Docker
-LOGGING = {
+logging.config.dictConfig({
     'version': 1,
     'disable_existing_loggers': False,
     'formatters': {
-        'verbose': {
-            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
-            'style': '{',
-        },
-        'simple': {
-            'format': '{levelname} {asctime} {module} {message}',
-            'style': '{',
-        },
-    },
-    'handlers': {
         'console': {
-            'level': 'INFO',
-            'class': 'logging.StreamHandler',
-            'formatter': 'simple'
+            'format': '%(asctime)s %(levelname)s [%(name)s:%(lineno)s] %(module)s %(message)s'
         },
     },
-    'root': {
-        'handlers': ['console'],
-        'level': 'INFO',
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['console'],
-            'level': 'INFO',
-            'propagate': False,
-        },
-        'shopapp': {
-            'handlers': ['console'],
-            'level': 'DEBUG' if DEBUG else 'INFO',
-            'propagate': False,
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "console"
         },
     },
-}
+    "loggers": {
+        "": {
+            "level": LOGLEVEL,
+            "handlers": [
+                "console"
+            ]
+        },
+    },
+})
 
 # Настройки Django REST Framework
 REST_FRAMEWORK = {
