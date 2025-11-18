@@ -1,0 +1,11 @@
+*.py linguist-detectable=true
+*.js linguist-detectable=true
+*.html linguist-detectable=true
+*.css linguist-detectable=true
+*.md linguist-detectable=true
+*.py linguist-language=Python
+venv/** linguist-vendored
+.venv/** linguist-vendored
+staticfiles/** linguist-vendored
+static/** linguist-vendored
+__pycache__/** linguist-vendored

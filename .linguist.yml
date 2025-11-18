@@ -1,0 +1,9 @@
+linguist-language: Python
+vendored_directories:
+  - "staticfiles/"
+  - "static/"
+  - "venv/"
+  - ".venv/"
+  - "__pycache__/"
+  - "uploads/"
+  - "database/"
