@@ -28,6 +28,31 @@
 <div class="content" style="margin: 40px 0; padding: 30px; background: #ffffff; border: 1px solid #e9ecef; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); font-size: 1.1em; white-space: pre-wrap; word-wrap: break-word; line-height: 1.8;">
     {{ article.content }}
 </div>
+
+{% if can_edit or can_delete %}
+<div class="article-actions" style="margin: 30px 0; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+    <h3 style="margin-bottom: 15px;">Действия со статьей</h3>
+    {% if can_edit %}
+    <a href="{% url 'blogapp:article_edit' article.pk %}" class="btn-edit" style="display: inline-block; background: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; margin-right: 10px;">
+        ✏️ Редактировать статью
+    </a>
+    {% endif %}
+    {% if can_delete %}
+    <button onclick="confirmDelete()" class="btn-delete" style="background: #dc3545; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">
+        🗑️ Удалить статью
+    </button>
+    {% endif %}
+</div>
+
+<script>
+function confirmDelete() {
+    if (confirm('Вы уверены, что хотите удалить эту статью?')) {
+        // Здесь можно добавить логику удаления
+        alert('Функция удаления будет реализована позже');
+    }
+}
+</script>
+{% endif %}
 {% endblock %}
 
 {% block back_link %}

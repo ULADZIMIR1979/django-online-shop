@@ -191,24 +191,28 @@ class OrderViewSet(ModelViewSet):
 
 
 class ShopIndexView(View):
-    """Представление для главной страницы магазина."""
-
-    # @method_decorator(cache_page(60 * 2))
     def get(self, request: HttpRequest) -> HttpResponse:
-        """Обработка GET-запроса."""
+        # Получаем реальные товары из базы
+        real_products = Product.objects.filter(archived=False)
 
-        products = [
-            {"name": "Laptop", "price": 1999},
-            {"name": "Desktop", "price": 2999},
-            {"name": "Smartphone", "price": 999},
+        # Формируем данные для шаблона
+        products_data = [
+            {
+                "name": product.name,
+                "price": product.price,
+                "description": product.description,
+                "pk": product.pk  # если нужно ссылки делать
+            }
+            for product in real_products
         ]
+
         context = {
             "time_running": default_timer(),
-            "products": products,
+            "products": products_data,  # теперь реальные товары
+            "real_products": real_products,  # или можно передать queryset напрямую
         }
-        print('shop index context', context)
 
-        log.debug("Products for shop index: %s", products)
+        log.debug("Products for shop index: %s", products_data)
         log.info("Rendering shop index")
 
         return render(request, 'shopapp/shop-index.html', context=context)

@@ -1,0 +1,44 @@
+{% extends 'blogapp/base.html' %}
+
+{% block title %}Редактирование: {{ article.title }} - Блог{% endblock %}
+
+{% block content %}
+<div class="edit-header" style="border-bottom: 2px solid #007bff; padding-bottom: 25px; margin-bottom: 30px;">
+    <h1 style="color: #2c3e50; margin-bottom: 15px;">Редактирование статьи</h1>
+    <p style="color: #666;">Редактируете: "{{ article.title }}"</p>
+</div>
+
+<form method="post" style="max-width: 800px;">
+    {% csrf_token %}
+    
+    <div style="margin-bottom: 20px;">
+        <label style="display: block; margin-bottom: 5px; font-weight: bold;">Заголовок:</label>
+        {{ form.title }}
+    </div>
+    
+    <div style="margin-bottom: 20px;">
+        <label style="display: block; margin-bottom: 5px; font-weight: bold;">Содержание:</label>
+        {{ form.content }}
+    </div>
+    
+    <div style="margin-bottom: 20px;">
+        <label style="display: block; margin-bottom: 5px; font-weight: bold;">Категория:</label>
+        {{ form.category }}
+    </div>
+    
+    <div style="margin-bottom: 30px;">
+        <label style="display: block; margin-bottom: 5px; font-weight: bold;">Теги:</label>
+        {{ form.tags }}
+        <small style="color: #666;">Удерживайте Ctrl для выбора нескольких тегов</small>
+    </div>
+    
+    <div style="display: flex; gap: 15px;">
+        <button type="submit" style="background: #007bff; color: white; padding: 12px 30px; border: none; border-radius: 5px; cursor: pointer; font-size: 1.1em;">
+            💾 Сохранить изменения
+        </button>
+        <a href="{% url 'blogapp:article_detail' article.pk %}" style="background: #6c757d; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-size: 1.1em;">
+            ❌ Отмена
+        </a>
+    </div>
+</form>
+{% endblock %}
