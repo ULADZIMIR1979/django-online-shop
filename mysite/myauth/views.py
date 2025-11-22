@@ -2,6 +2,7 @@ from random import random
 
 from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
 from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.contrib.auth.views import LogoutView
 from django.http import HttpRequest, HttpResponse, JsonResponse
@@ -33,11 +34,12 @@ class HelloView(View):
         )
 
 
-class AboutMeView(UpdateView):
+class AboutMeView(LoginRequiredMixin, UpdateView):
     model = Profile
     template_name = "myauth/about-me.html"
     fields = ['bio', 'avatar']
     success_url = reverse_lazy('myauth:about-me')
+    login_url = reverse_lazy('myauth:login')  # URL для перенаправления
 
     def get_object(self, queryset=None):
         # Получаем или создаем профиль для текущего пользователя
@@ -87,22 +89,34 @@ class UserDetailView(DetailView):
     def get_object(self, queryset=None):
         # Получаем профиль по user_id из URL, или создаем если нет
         user_id = self.kwargs.get('user_id')
-        profile, created = Profile.objects.get_or_create(user_id=user_id)
-        return profile
+        try:
+            user = User.objects.get(id=user_id)
+            profile, created = Profile.objects.get_or_create(user=user)
+            return profile
+        except User.DoesNotExist:
+            # Обработка случая, когда пользователь не существует
+            from django.http import Http404
+            raise Http404("User does not exist")
 
 
-class ProfileUpdateView(UpdateView):
+class ProfileUpdateView(LoginRequiredMixin, UpdateView):
     model = Profile
     template_name = "myauth/profile-update.html"
     fields = ['bio', 'avatar']
+    login_url = reverse_lazy('myauth:login')
 
     def get_success_url(self):
         return reverse_lazy('myauth:user-detail', kwargs={'user_id': self.object.user_id})
 
     def get_object(self, queryset=None):
         user_id = self.kwargs.get('user_id')
-        profile, created = Profile.objects.get_or_create(user_id=user_id)
-        return profile
+        try:
+            user = User.objects.get(id=user_id)
+            profile, created = Profile.objects.get_or_create(user=user)
+            return profile
+        except User.DoesNotExist:
+            from django.http import Http404
+            raise Http404("User does not exist")
 
     def dispatch(self, request, *args, **kwargs):
         # Проверка прав доступа
@@ -168,3 +182,4 @@ def get_session_view(request: HttpRequest) -> HttpResponse:
 class FooBarView(View):
     def get(self, request: HttpRequest) -> JsonResponse:
         return JsonResponse({"foo": "bar", "spam": "eggs"})
+        

@@ -1,0 +1,13 @@
+{% extends "admin/index.html" %}
+
+{% block content %}
+{{ block.super }}
+
+<div class="module">
+  <h2>Быстрые ссылки</h2>
+  <ul>
+    <li><a href="/shop/" target="_blank">🛒 Перейти в магазин</a></li>
+    <li><a href="/blog/articles/" target="_blank">📝 Перейти в блог</a></li>
+  </ul>
+</div>
+{% endblock %}
