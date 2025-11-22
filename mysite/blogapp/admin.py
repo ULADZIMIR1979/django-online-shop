@@ -28,6 +28,7 @@ class ArticleAdmin(admin.ModelAdmin):
     search_fields = ['title', 'content']
     filter_horizontal = ['tags']
     date_hierarchy = 'pub_date'
+    readonly_fields = ['pub_date']
 
     fieldsets = [
         ('Основная информация', {
@@ -37,10 +38,6 @@ class ArticleAdmin(admin.ModelAdmin):
             'fields': ['content'],
             'classes': ['wide']
         }),
-        ('Даты', {
-            'fields': ['pub_date'],
-            'classes': ['collapse']
-        }),
     ]
 
     def is_recent(self, obj):
@@ -49,3 +46,4 @@ class ArticleAdmin(admin.ModelAdmin):
 
     is_recent.boolean = True
     is_recent.short_description = 'Новая статья'
+    

@@ -251,3 +251,15 @@ if not os.path.exists('/tmp/django_sessions'):
 DEBUG_TOOLBAR_CONFIG = {
     'SHOW_TOOLBAR_CALLBACK': lambda request: DEBUG,
 }
+
+# Для работы через поддиректорию /shop/
+# USE_X_FORWARDED_HOST = True
+FORCE_SCRIPT_NAME = None
+
+# Обновите ALLOWED_HOSTS если нужно
+ALLOWED_HOSTS = ['217.12.40.196', 'localhost', '127.0.0.1']
+
+# Для корректных URL в шаблонах
+if FORCE_SCRIPT_NAME:
+    STATIC_URL = FORCE_SCRIPT_NAME + STATIC_URL
+    MEDIA_URL = FORCE_SCRIPT_NAME + MEDIA_URL
